@@ -2,13 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
-  Home, UserPlus, Users, Clock, CalendarDays, Folder, User, Sparkles, 
-  HelpCircle, ChevronDown, Check, Clock3, Globe, MapPin, MapPinHouse, Trash2, Plus, 
+  CalendarDays, ChevronDown, Check, Clock3, Globe, MapPin, MapPinHouse, Trash2, Plus, 
   AlertTriangle, Search, PlusCircle, ChevronUp, X, Info
 } from "lucide-react";
 
@@ -69,21 +68,13 @@ export default function App() {
         {/* Sidebar */}
       <aside className="w-[240px] bg-[#e5e7eb] flex flex-col h-full shrink-0">
         <div className="p-4 flex-1 overflow-y-auto space-y-1">
-          <NavItem icon={<Home size={18} />} label="Overview" />
-          <NavItem icon={<UserPlus size={18} />} label="Add new employee" />
-          <NavItem icon={<Users size={18} />} label="People" />
-          <NavItem icon={<Clock size={18} />} label="Time tracking" />
           <NavItem icon={<CalendarDays size={18} />} label="Absences" active />
-          <NavItem icon={<Folder size={18} />} label="Files" />
-          <NavItem icon={<User size={18} />} label="Employee space" />
-          <NavItem icon={<Sparkles size={18} />} label="Rita assistant" badge="BETA" />
         </div>
         <div className="p-4 space-y-2 mt-auto">
-          <NavItem icon={<HelpCircle size={18} />} label="Help Center" badge="NEW" badgeColor="bg-blue-200 text-blue-800" />
           <div className="flex items-center gap-2 p-2 hover:bg-gray-300 rounded cursor-pointer mt-2 text-sm font-medium">
-            <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-[10px]">FF</div>
-            <span className="flex-1 truncate">Fahrschule Fürste...</span>
-            <ChevronDown size={16} />
+            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-[10px] text-gray-500">C</div>
+            <span className="flex-1 truncate text-gray-500">Company Name</span>
+            <ChevronDown size={16} className="text-gray-400" />
           </div>
         </div>
       </aside>
@@ -170,37 +161,10 @@ export default function App() {
               <div className="pb-2 text-gray-500 cursor-pointer">Declined</div>
             </div>
 
-            <div className="bg-gray-100/50 rounded-lg border border-gray-200 overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-12 text-xs font-semibold text-gray-500 uppercase">ID</TableHead>
-                    <TableHead className="text-xs font-semibold text-gray-500 uppercase">LAST NAME ↑</TableHead>
-                    <TableHead className="text-xs font-semibold text-gray-500 uppercase border-r">FIRST NAME</TableHead>
-                    {[...Array(13)].map((_, i) => (
-                      <TableHead key={i} className={`p-0 min-w-[32px] text-center text-[10px] uppercase font-semibold ${i === 8 ? 'bg-blue-100/50 text-blue-600' : 'text-gray-500'}`}>
-                        <div className="flex flex-col items-center justify-center h-full">
-                          <span>{['Mo','Tu','We','Th','Fr','Sa','Su'][i % 7]}</span>
-                          <span className={i === 8 ? "text-blue-600" : "text-gray-900"}>{i + 1}</span>
-                        </div>
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow className="hover:bg-transparent border-b-gray-200">
-                    <TableCell className="font-medium text-right text-gray-500">5</TableCell>
-                    <TableCell className="font-medium">Balotelli</TableCell>
-                    <TableCell className="font-medium border-r">Mario</TableCell>
-                    {[...Array(13)].map((_, i) => (
-                      <TableCell key={i} className={`p-0 border-r border-gray-200/50 ${i === 3 ? 'bg-purple-100/50' : i === 8 ? 'bg-blue-100/50' : i === 4 || i === 5 ? 'bg-gray-200/30' : ''}`}></TableCell>
-                    ))}
-                  </TableRow>
-                </TableBody>
-              </Table>
-              <div className="p-4 text-xs text-gray-500">
-                Showing <span className="font-medium text-gray-700">1</span> of 1 items
-              </div>
+            <div className="bg-gray-100/50 border border-gray-200 rounded-xl p-16 flex flex-col items-center justify-center">
+              <div className="w-16 h-16 bg-gray-200 rounded-full mb-4 animate-pulse"></div>
+              <div className="h-5 w-48 bg-gray-200 rounded mb-2 animate-pulse"></div>
+              <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
             </div>
           </div>
         </div>
@@ -340,9 +304,7 @@ function EmployeesPopover({
                     // Show badge only if the state was changed to this state
                     if (initialState && initialState !== stateName) {
                       return (
-                        <div className="flex items-center gap-1.5 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded shrink-0 text-[11px] font-medium">
-                          <span className="line-through opacity-70">{initialState}</span>
-                          <span>→</span>
+                        <div className="flex items-center gap-1.5 px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded shrink-0 text-[11px] font-medium">
                           <span>{stateName}</span>
                         </div>
                       );
@@ -919,11 +881,9 @@ function StateCard({
         
         <div className="flex items-center gap-4">
           {/* Facepile / Employee Selector */}
-          <Tooltip>
             {uiVariant === 'drawer' ? (
-              <TooltipTrigger asChild>
                 <div 
-                  className="flex items-center relative cursor-pointer"
+                  className="flex items-center relative cursor-pointer px-1.5 py-1 -mr-1.5 rounded-md hover:bg-gray-100 transition-colors"
                   onClick={handleOpenDrawer}
                 >
                   {selectedEmployees.length === 0 ? (
@@ -956,7 +916,6 @@ function StateCard({
                     </div>
                   )}
                 </div>
-              </TooltipTrigger>
             ) : (
               <EmployeesPopover 
                 stateName={name}
@@ -965,9 +924,8 @@ function StateCard({
                 employeeAssignments={employeeAssignments}
                 defaultState={defaultState}
               >
-                <TooltipTrigger asChild>
                   <div 
-                    className="flex items-center relative cursor-pointer"
+                    className="flex items-center relative cursor-pointer px-1.5 py-1 -mr-1.5 rounded-md hover:bg-gray-100 transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {selectedEmployees.length === 0 ? (
@@ -997,13 +955,8 @@ function StateCard({
                       </div>
                     )}
                   </div>
-                </TooltipTrigger>
               </EmployeesPopover>
             )}
-            <TooltipContent className="bg-gray-900 text-white border-gray-800 text-[13px] py-2 px-3 shadow-xl">
-              <p>Assign employees</p>
-            </TooltipContent>
-          </Tooltip>
 
           <button className="text-gray-400 hover:text-gray-600 rounded-md transition-colors outline-none focus:ring-0">
             {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
