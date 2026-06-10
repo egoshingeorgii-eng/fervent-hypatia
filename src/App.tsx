@@ -8,7 +8,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
   CalendarDays, ChevronDown, Check, Clock3, Globe, MapPin, MapPinHouse, Trash2, Plus, 
-  AlertTriangle, Search, PlusCircle, ChevronUp, X, Info
+  AlertTriangle, Search, PlusCircle, ChevronUp, X, Info, Users, UserPlus, Download,
+  Settings2, ChevronLeft, ChevronRight, MoreHorizontal, FileText, CreditCard, FileBadge, History
 } from "lucide-react";
 
 const GERMAN_STATES = [
@@ -19,35 +20,38 @@ const GERMAN_STATES = [
 
 // Facepile data
 const ALL_EMPLOYEES = [
-  { id: '1', initials: 'MJ', color: 'bg-blue-500', name: 'Maria Jensen' },
-  { id: '2', initials: 'SP', color: 'bg-teal-500', name: 'Stefan Petrov' },
-  { id: '3', initials: 'DR', color: 'bg-purple-500', name: 'Diana Richter' },
-  { id: '4', initials: 'JD', color: 'bg-orange-500', name: 'John Doe' },
-  { id: '5', initials: 'AS', color: 'bg-pink-500', name: 'Anna Smith' },
-  { id: '6', initials: 'TM', color: 'bg-red-500', name: 'Thomas Müller' },
-  { id: '7', initials: 'LW', color: 'bg-indigo-500', name: 'Laura Weber' },
-  { id: '8', initials: 'KF', color: 'bg-cyan-500', name: 'Kevin Fischer' },
-  { id: '9', initials: 'SW', color: 'bg-emerald-500', name: 'Sarah Wagner' },
-  { id: '10', initials: 'MB', color: 'bg-violet-500', name: 'Michael Becker' },
-  { id: '11', initials: 'JH', color: 'bg-rose-500', name: 'Julia Hoffmann' },
-  { id: '12', initials: 'DS', color: 'bg-amber-500', name: 'David Schäfer' },
-  { id: '13', initials: 'NK', color: 'bg-lime-500', name: 'Nina Koch' },
-  { id: '14', initials: 'PB', color: 'bg-sky-500', name: 'Paul Bauer' },
-  { id: '15', initials: 'LK', color: 'bg-fuchsia-500', name: 'Lisa Klein' },
-  { id: '16', initials: 'MW', color: 'bg-stone-500', name: 'Markus Wolf' },
-  { id: '17', initials: 'SN', color: 'bg-green-500', name: 'Sophie Neumann' },
-  { id: '18', initials: 'CS', color: 'bg-yellow-500', name: 'Christian Schwarz' },
-  { id: '19', initials: 'EZ', color: 'bg-zinc-500', name: 'Emma Zimmermann' },
-  { id: '20', initials: 'AK', color: 'bg-slate-500', name: 'Alexander Krüger' },
-  { id: '21', initials: 'LH', color: 'bg-blue-400', name: 'Leon Hofmann' },
-  { id: '22', initials: 'MW', color: 'bg-purple-400', name: 'Mia Werner' },
-  { id: '23', initials: 'FL', color: 'bg-teal-400', name: 'Felix Lange' },
-  { id: '24', initials: 'CM', color: 'bg-orange-400', name: 'Clara Meyer' }
+  { id: '1', initials: 'MJ', color: 'bg-blue-500', name: 'Maria Jensen', jobTitle: 'HR Manager' },
+  { id: '2', initials: 'SP', color: 'bg-teal-500', name: 'Stefan Petrov', jobTitle: 'Software Engineer' },
+  { id: '3', initials: 'DR', color: 'bg-purple-500', name: 'Diana Richter', jobTitle: 'Product Designer' },
+  { id: '4', initials: 'JD', color: 'bg-orange-500', name: 'John Doe', jobTitle: 'Sales Manager' },
+  { id: '5', initials: 'AS', color: 'bg-pink-500', name: 'Anna Smith', jobTitle: 'Marketing Lead' },
+  { id: '6', initials: 'TM', color: 'bg-red-500', name: 'Thomas Müller', jobTitle: 'Backend Developer' },
+  { id: '7', initials: 'LW', color: 'bg-indigo-500', name: 'Laura Weber', jobTitle: 'UX Researcher' },
+  { id: '8', initials: 'KF', color: 'bg-cyan-500', name: 'Kevin Fischer', jobTitle: 'DevOps Engineer' },
+  { id: '9', initials: 'SW', color: 'bg-emerald-500', name: 'Sarah Wagner', jobTitle: 'Data Analyst' },
+  { id: '10', initials: 'MB', color: 'bg-violet-500', name: 'Michael Becker', jobTitle: 'Engineering Manager' },
+  { id: '11', initials: 'JH', color: 'bg-rose-500', name: 'Julia Hoffmann', jobTitle: 'Recruiter' },
+  { id: '12', initials: 'DS', color: 'bg-amber-500', name: 'David Schäfer', jobTitle: 'Account Executive' },
+  { id: '13', initials: 'NK', color: 'bg-lime-500', name: 'Nina Koch', jobTitle: 'Content Strategist' },
+  { id: '14', initials: 'PB', color: 'bg-sky-500', name: 'Paul Bauer', jobTitle: 'Frontend Developer' },
+  { id: '15', initials: 'LK', color: 'bg-fuchsia-500', name: 'Lisa Klein', jobTitle: 'Office Manager' },
+  { id: '16', initials: 'MW', color: 'bg-stone-500', name: 'Markus Wolf', jobTitle: 'Legal Counsel' },
+  { id: '17', initials: 'SN', color: 'bg-green-500', name: 'Sophie Neumann', jobTitle: 'Finance Analyst' },
+  { id: '18', initials: 'CS', color: 'bg-yellow-500', name: 'Christian Schwarz', jobTitle: 'Product Manager' },
+  { id: '19', initials: 'EZ', color: 'bg-zinc-500', name: 'Emma Zimmermann', jobTitle: 'QA Engineer' },
+  { id: '20', initials: 'AK', color: 'bg-slate-500', name: 'Alexander Krüger', jobTitle: 'CTO' },
+  { id: '21', initials: 'LH', color: 'bg-blue-400', name: 'Leon Hofmann', jobTitle: 'Support Specialist' },
+  { id: '22', initials: 'MW', color: 'bg-purple-400', name: 'Mia Werner', jobTitle: 'Brand Designer' },
+  { id: '23', initials: 'FL', color: 'bg-teal-400', name: 'Felix Lange', jobTitle: 'Security Engineer' },
+  { id: '24', initials: 'CM', color: 'bg-orange-400', name: 'Clara Meyer', jobTitle: 'People Operations' }
 ];
 
-function NavItem({ icon, label, active, badge, badgeColor = "bg-gray-200 text-gray-700" }: { icon: React.ReactNode, label: string, active?: boolean, badge?: string, badgeColor?: string }) {
+function NavItem({ icon, label, active, badge, badgeColor = "bg-gray-200 text-gray-700", onClick }: { icon: React.ReactNode, label: string, active?: boolean, badge?: string, badgeColor?: string, onClick?: () => void }) {
   return (
-    <div className={`flex items-center gap-3 p-2 rounded cursor-pointer text-sm font-medium ${active ? 'bg-gray-300 text-gray-900' : 'hover:bg-gray-300 text-gray-600'}`}>
+    <div
+      className={`flex items-center gap-3 p-2 rounded cursor-pointer text-sm font-medium ${active ? 'bg-gray-300 text-gray-900' : 'hover:bg-gray-300 text-gray-600'}`}
+      onClick={onClick}
+    >
       {icon}
       <span className="flex-1">{label}</span>
       {badge && <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${badgeColor}`}>{badge}</span>}
@@ -55,37 +59,59 @@ function NavItem({ icon, label, active, badge, badgeColor = "bg-gray-200 text-gr
   );
 }
 
+// EMPLOYEES DATA for People page
+const PEOPLE_EMPLOYEES = [
+  { id: 'p1', lastName: 'INFORMACIONE', firstName: 'GEORGII', jobTitle: 'QA', events: null, birthday: '26.08.1978', contractStart: '26.09.2025', contractEnd: null, salary: '€3,300.00', paymentComponents: ['Wage/Salary'] },
+  { id: 'p2', lastName: 'Dmndd', firstName: 'Jdjd', jobTitle: null, events: null, birthday: '12.08.1993', contractStart: '26.08.2025', contractEnd: null, salary: '€7,505.00', paymentComponents: ['Wage/Salary'] },
+  { id: 'p3', lastName: 'Mustaras', firstName: 'Maria', jobTitle: 'QA', events: 'Missing data', birthday: '03.12.1985', contractStart: '02.12.2030', contractEnd: null, salary: '€5,039.25', paymentComponents: ['Wage/Salary'] },
+  { id: 'p4', lastName: 'test2', firstName: 'GEORGII', jobTitle: 'QA', events: null, birthday: '26.08.1947', contractStart: '26.09.2025', contractEnd: '27.09.2025', salary: '€3,890.00', paymentComponents: ['Wage/Salary'] },
+  { id: 'p5', lastName: 'Muster', firstName: 'Maria', jobTitle: 'Geeeg', events: 'Missing data', birthday: '03.09.1983', contractStart: '04.06.2025', contractEnd: null, salary: '€3,000.00', paymentComponents: ['Wage/Salary'] },
+  { id: 'p6', lastName: 'INFORMACIONE', firstName: 'Maria', jobTitle: 'Hager', events: null, birthday: '30.12.1972', contractStart: '20.08.2025', contractEnd: null, salary: '€3,000.00', paymentComponents: ['Wage/Salary'] },
+  { id: 'p7', lastName: 'Mustorman', firstName: 'Mark', jobTitle: 'Assistentin - Textverarb...', events: 'Missing data', birthday: '09.08.2001', contractStart: '07.08.2024', contractEnd: null, salary: '€5,000.00', paymentComponents: ['Wage/Salary'] },
+  { id: 'p8', lastName: 'INFORMACIONE', firstName: 'GEORGII', jobTitle: 'Aushilfe', events: 'Missing data', birthday: '31.07.1980', contractStart: '01.08.2024', contractEnd: null, salary: '€7,250.00', paymentComponents: ['Wage/Salary', 'Benefit'] },
+  { id: 'p9', lastName: 'Stebert', firstName: 'Christian', jobTitle: 'Assistentin - Textverarb...', events: null, birthday: '11.12.1967', contractStart: '03.04.1997', contractEnd: '01.04.2022', salary: '€5,008.00', paymentComponents: ['Wage/Salary', 'Benefit'] },
+  { id: 'p10', lastName: 'Stebert', firstName: 'Christian', jobTitle: 'Developer', events: null, birthday: '11.12.1967', contractStart: '12.10.2025', contractEnd: null, salary: '€6,657.00', paymentComponents: ['Wage/Salary'] },
+];
+
 export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [defaultState, setDefaultState] = useState<string | null>('Bavaria');
   const [activeStates, setActiveStates] = useState<string[]>(['Bavaria', 'Berlin']);
   const [employeeAssignments, setEmployeeAssignments] = useState<Record<string, string[]>>({});
   const [uiVariant, setUiVariant] = useState<'drawer' | 'popover'>('popover');
+  const [activePage, setActivePage] = useState<'absences' | 'people'>('absences');
+  const [selectedEmployee, setSelectedEmployee] = useState<typeof PEOPLE_EMPLOYEES[0] | null>(null);
 
   return (
     <TooltipProvider delayDuration={300}>
       <div className="flex h-screen bg-[#f3f4f6]">
         {/* Sidebar */}
-      <aside className="w-[240px] bg-[#e5e7eb] flex flex-col h-full shrink-0">
-        <div className="p-4 flex-1 overflow-y-auto space-y-1">
-          <NavItem icon={<CalendarDays size={18} />} label="Absences" active />
-        </div>
-        <div className="p-4 space-y-2 mt-auto">
-          <div className="flex items-center gap-2 p-2 hover:bg-gray-300 rounded cursor-pointer mt-2 text-sm font-medium">
-            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-[10px] text-gray-500">C</div>
-            <span className="flex-1 truncate text-gray-500">Company Name</span>
-            <ChevronDown size={16} className="text-gray-400" />
+        <aside className="w-[240px] bg-[#e5e7eb] flex flex-col h-full shrink-0">
+          <div className="p-4 flex-1 overflow-y-auto space-y-1">
+            <NavItem icon={<CalendarDays size={18} />} label="Absences" active={activePage === 'absences'} onClick={() => { setActivePage('absences'); setSelectedEmployee(null); }} />
+            <NavItem icon={<Users size={18} />} label="People" active={activePage === 'people'} onClick={() => { setActivePage('people'); setSelectedEmployee(null); }} />
           </div>
-        </div>
-      </aside>
+          <div className="p-4 space-y-2 mt-auto">
+            <div className="flex items-center gap-2 p-2 hover:bg-gray-300 rounded cursor-pointer mt-2 text-sm font-medium">
+              <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-[10px] text-gray-500">C</div>
+              <span className="flex-1 truncate text-gray-500">Company Name</span>
+              <ChevronDown size={16} className="text-gray-400" />
+            </div>
+          </div>
+        </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-[#f3f4f6]">
-        <div className="p-8 max-w-6xl mx-auto space-y-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-900">Absences</h1>
-            <Button variant="outline" onClick={() => setIsModalOpen(true)}>Manage holidays</Button>
-          </div>
+        {/* Main Content */}
+        <main className="flex-1 overflow-auto bg-[#f3f4f6]">
+          {activePage === 'people' && selectedEmployee ? (
+            <EmployeeDetailPage employee={selectedEmployee} onBack={() => setSelectedEmployee(null)} allEmployees={PEOPLE_EMPLOYEES} />
+          ) : activePage === 'people' ? (
+            <PeoplePage employees={PEOPLE_EMPLOYEES} onSelectEmployee={setSelectedEmployee} />
+          ) : (
+          <div className="p-8 max-w-6xl mx-auto space-y-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-semibold text-gray-900">Absences</h1>
+              <Button variant="outline" onClick={() => setIsModalOpen(true)}>Manage holidays</Button>
+            </div>
 
           {/* Debug Panel */}
           <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-3 shadow-sm">
@@ -167,23 +193,350 @@ export default function App() {
               <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
             </div>
           </div>
-        </div>
-      </main>
+          </div>
+          )}
+        </main>
 
-      {/* Sheet Wrapper */}
-      <ManageHolidaysSheet 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        defaultState={defaultState} 
-        setDefaultState={setDefaultState} 
-        activeStates={activeStates} 
-        setActiveStates={setActiveStates}
-        employeeAssignments={employeeAssignments}
-        setEmployeeAssignments={setEmployeeAssignments}
-        uiVariant={uiVariant}
-      />
-    </div>
+        {/* Sheet Wrapper */}
+        <ManageHolidaysSheet 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          defaultState={defaultState} 
+          setDefaultState={setDefaultState} 
+          activeStates={activeStates} 
+          setActiveStates={setActiveStates}
+          employeeAssignments={employeeAssignments}
+          setEmployeeAssignments={setEmployeeAssignments}
+          uiVariant={uiVariant}
+        />
+      </div>
     </TooltipProvider>
+  );
+}
+
+// ─── People Page ──────────────────────────────────────────────────────────────
+function PeoplePage({ employees, onSelectEmployee }: { employees: typeof PEOPLE_EMPLOYEES, onSelectEmployee: (emp: typeof PEOPLE_EMPLOYEES[0]) => void }) {
+  const [activeTab, setActiveTab] = useState<'active' | 'awaiting' | 'archived'>('active');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filtered = employees.filter(e =>
+    `${e.firstName} ${e.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Top bar */}
+      <div className="flex items-center px-6 py-4 bg-white border-b border-gray-200">
+        <h1 className="text-[22px] font-bold text-gray-900">People</h1>
+      </div>
+
+      <div className="p-6 flex-1 overflow-auto">
+        {/* Employees header */}
+        <div className="mb-4">
+          <h2 className="text-[18px] font-bold text-gray-900">Employees</h2>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex items-center gap-1 mb-4">
+          {(['active', 'awaiting', 'archived'] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors ${
+                activeTab === tab ? 'bg-gray-200 text-gray-900' : 'text-gray-500 hover:bg-gray-100'
+              }`}
+            >
+              {tab === 'active' && <><span className="capitalize">{tab}</span><span className="bg-gray-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">10</span></>}
+              {tab === 'awaiting' && <span>Awaiting start</span>}
+              {tab === 'archived' && <><span className="capitalize">{tab}</span><span className="bg-gray-300 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">6</span></>}
+            </button>
+          ))}
+        </div>
+
+        {/* Table */}
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100">
+                <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider w-12">ID</th>
+                <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Last name</th>
+                <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">First name</th>
+                <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Job title</th>
+                <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Events</th>
+                <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Birthday</th>
+                <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Contract start</th>
+                <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Contract end</th>
+                <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Salary/Wage</th>
+                <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Payment components</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((emp) => (
+                <tr
+                  key={emp.id}
+                  className="border-b border-gray-50 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => onSelectEmployee(emp)}
+                >
+                  <td className="px-4 py-3 text-[13px] text-gray-400">-</td>
+                  <td className="px-4 py-3 text-[13px] font-medium text-gray-800">{emp.lastName}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{emp.firstName}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-600">{emp.jobTitle || ''}</td>
+                  <td className="px-4 py-3">
+                    {emp.events ? (
+                      <span className="inline-block px-2 py-0.5 bg-orange-100 text-orange-700 text-[11px] font-semibold rounded">{emp.events}</span>
+                    ) : <span className="text-gray-400">–</span>}
+                  </td>
+                  <td className="px-4 py-3 text-[13px] text-gray-600">{emp.birthday}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-600">{emp.contractStart}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-600">{emp.contractEnd || '—'}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700 font-medium">{emp.salary}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-1">
+                      {emp.paymentComponents.map(c => (
+                        <span key={c} className="inline-block px-2 py-0.5 bg-gray-100 text-gray-600 text-[11px] rounded">{c}</span>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {/* Pagination */}
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
+            <span className="text-[12px] text-gray-500">Showing 1-10 of 10 items</span>
+            <div className="flex items-center gap-1">
+              <button className="p-1.5 rounded hover:bg-gray-200 transition-colors text-gray-400"><ChevronLeft size={14} /></button>
+              <button className="p-1.5 rounded hover:bg-gray-200 transition-colors text-gray-400"><ChevronLeft size={14} /></button>
+              <button className="w-7 h-7 rounded bg-white border border-gray-300 text-[12px] font-semibold text-gray-800 shadow-sm">1</button>
+              <button className="p-1.5 rounded hover:bg-gray-200 transition-colors text-gray-400"><ChevronRight size={14} /></button>
+              <button className="p-1.5 rounded hover:bg-gray-200 transition-colors text-gray-400"><ChevronRight size={14} /></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Employee Detail Page ─────────────────────────────────────────────────────
+function EmployeeDetailPage({ employee, onBack, allEmployees }: { employee: typeof PEOPLE_EMPLOYEES[0], onBack: () => void, allEmployees: typeof PEOPLE_EMPLOYEES }) {
+  const [activeTab, setActiveTab] = useState<'masterdata' | 'employment' | 'payment' | 'documents' | 'absences'>('employment');
+  const currentIndex = allEmployees.findIndex(e => e.id === employee.id);
+  const total = allEmployees.length;
+
+  return (
+    <div className="flex flex-col h-full bg-white">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 px-6 py-3 border-b border-gray-100 text-[13px] text-gray-500">
+        <button onClick={onBack} className="hover:text-blue-600 transition-colors font-medium">People</button>
+        <span className="text-gray-300">/</span>
+        <span className="text-gray-700 font-medium">{employee.firstName} {employee.lastName}</span>
+        <div className="ml-auto flex items-center gap-3">
+          <div className="flex items-center gap-1 text-[12px] text-gray-500">
+            <button className="p-1 hover:bg-gray-100 rounded transition-colors"><ChevronLeft size={14} /></button>
+            <span>{currentIndex + 1} of {total} (Active)</span>
+            <button className="p-1 hover:bg-gray-100 rounded transition-colors"><ChevronRight size={14} /></button>
+          </div>
+          <span className="text-[13px] font-medium text-gray-700">December 2025</span>
+        </div>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left: Main content */}
+        <div className="flex-1 overflow-auto">
+          {/* Employee header */}
+          <div className="px-6 py-5 border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-[14px] font-bold text-gray-600">
+                  {employee.firstName[0]}{employee.lastName[0]}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-[18px] font-bold text-gray-900">{employee.firstName} {employee.lastName}</h1>
+                    <button className="text-gray-400 hover:text-gray-600 transition-colors"><Settings2 size={14} /></button>
+                  </div>
+                </div>
+              </div>
+              <button className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-md hover:bg-gray-100">
+                <MoreHorizontal size={18} />
+              </button>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex items-center gap-6 mt-5 border-b border-gray-200">
+              {[
+                { key: 'masterdata', label: 'Master data' },
+                { key: 'employment', label: 'Employment', badge: '2' },
+                { key: 'payment', label: 'Payment' },
+                { key: 'documents', label: 'Documents' },
+                { key: 'absences', label: 'Absences' },
+              ].map(tab => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key as typeof activeTab)}
+                  className={`flex items-center gap-1.5 pb-3 text-[14px] font-medium transition-colors border-b-2 -mb-[1px] ${
+                    activeTab === tab.key
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {tab.label}
+                  {tab.badge && (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                      activeTab === tab.key ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                    }`}>{tab.badge}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tab content */}
+          {activeTab === 'employment' && (
+            <div className="px-6 py-5">
+              {/* Employment details card */}
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-2 text-[14px] font-semibold text-gray-700">
+                  <FileText size={16} className="text-gray-400" />
+                  Employment details
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" className="text-red-600 border-red-200 bg-red-50 hover:bg-red-100 text-[12px] font-semibold h-8">
+                    Terminate contract
+                  </Button>
+                  <Button size="sm" variant="outline" className="text-[12px] font-semibold h-8 flex items-center gap-1.5">
+                    <FileBadge size={13} /> Edit
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-x-16 gap-y-5">
+                <FieldGroup label="Job title" value={employee.jobTitle || '—'} />
+                <FieldGroup label="Contract Type" value="Unlimited full-time contract" />
+                <FieldGroup label="Employment Type" value="Minijob" />
+                <FieldGroup label="Personnel number" value="—" />
+                <FieldGroup label="Employee exempt from pension insurance" value="No" />
+                <div />
+                <FieldGroup label="Contract start" value={employee.contractStart} />
+                <div />
+                <FieldGroup label="Trial period" value="No" />
+                <div />
+                <FieldGroup label="Contractual workdays" value="Tuesday Total: 4.00 hours" />
+                <FieldGroup label="Contractual Vacation days (per year)" value="20" />
+                <FieldGroup label="Additional Payments" value="No" />
+                <FieldGroup label="Remaining vacation days in current year" value="20.5" />
+                <FieldGroup label="Do you have additional employments?" value="This is the only employment" />
+                <div />
+                <FieldGroup label="Is the place of work (federal state) different from the company's location?" value="No" />
+                <div />
+                <FieldGroup label="Cost center" value="—" />
+                <FieldGroup label="Cost unit" value="—" />
+                <FieldGroup label="Comment field (employee)" value="—" />
+                <FieldGroup label="Comment field (HR-admin)" value="—" />
+                <FieldGroup label="Payment type" value="Bank transfer" />
+                <div />
+              </div>
+
+              <button className="mt-6 flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                <Plus size={14} className="text-blue-600" /> Create a new contract
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'masterdata' && (
+            <div className="px-6 py-5 text-[14px] text-gray-500 italic">Master data content...</div>
+          )}
+          {activeTab === 'payment' && (
+            <div className="px-6 py-5 text-[14px] text-gray-500 italic">Payment content...</div>
+          )}
+          {activeTab === 'documents' && (
+            <div className="px-6 py-5 text-[14px] text-gray-500 italic">Documents content...</div>
+          )}
+          {activeTab === 'absences' && (
+            <div className="px-6 py-5 space-y-4">
+
+              {/* Card: Vacation entitlement */}
+              <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+                      <CalendarDays size={18} strokeWidth={2} />
+                    </div>
+                    <span className="text-[15px] font-semibold text-gray-900">Vacation entitlement</span>
+                  </div>
+                  <Button size="sm" variant="outline" className="text-[12px] font-semibold h-8 flex items-center gap-1.5 text-gray-600">
+                    <FileBadge size={13} /> Edit
+                  </Button>
+                </div>
+                <div className="px-5 py-4 grid grid-cols-2 gap-x-16 gap-y-5">
+                  <FieldGroup label="Contractual vacation days (per year)" value="20" />
+                  <FieldGroup label="Remaining vacation days in current year" value="20.5" />
+                  <FieldGroup label="Vacation days carried over" value="0.5" />
+                  <FieldGroup label="Vacation calculation method" value="By contract" />
+                </div>
+              </div>
+
+              {/* Card: Absence overview */}
+              <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+                      <Clock3 size={18} strokeWidth={2} />
+                    </div>
+                    <span className="text-[15px] font-semibold text-gray-900">Absence overview</span>
+                  </div>
+                  <Button size="sm" variant="outline" className="text-[12px] font-semibold h-8 flex items-center gap-1.5 text-gray-600">
+                    <FileBadge size={13} /> Edit
+                  </Button>
+                </div>
+                <div className="px-5 py-4 grid grid-cols-2 gap-x-16 gap-y-5">
+                  <FieldGroup label="Sick days this year" value="0" />
+                  <FieldGroup label="Sick days last year" value="0" />
+                  <FieldGroup label="Unpaid leave days this year" value="0" />
+                  <FieldGroup label="Parental leave" value="No" />
+                  <FieldGroup label="Maternity protection" value="No" />
+                  <FieldGroup label="Other absences" value="—" />
+                </div>
+              </div>
+
+              {/* Card: Public holidays */}
+              <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+                      <Globe size={18} strokeWidth={2} />
+                    </div>
+                    <span className="text-[15px] font-semibold text-gray-900">Public holidays</span>
+                  </div>
+                  <Button size="sm" variant="outline" className="text-[12px] font-semibold h-8 flex items-center gap-1.5 text-gray-600">
+                    <FileBadge size={13} /> Edit
+                  </Button>
+                </div>
+                <div className="px-5 py-4 grid grid-cols-2 gap-x-16 gap-y-5">
+                  <FieldGroup label="Work location (federal state)" value="Bavaria" />
+                  <FieldGroup label="Public holiday schedule" value="Bavaria – 13 holidays" />
+                  <FieldGroup label="Assignment method" value="Default (company-wide)" />
+                  <FieldGroup label="Effective from" value={employee.contractStart} />
+                </div>
+              </div>
+
+            </div>
+          )}
+        </div>
+
+
+      </div>
+    </div>
+  );
+}
+
+function FieldGroup({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[12px] text-gray-500 mb-1">{label}</p>
+      <p className="text-[14px] font-semibold text-gray-900">{value}</p>
+    </div>
   );
 }
 
@@ -284,15 +637,13 @@ function EmployeesPopover({
             return (
               <div
                 key={emp.id}
-                className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
+                className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors"
                 onClick={() => onToggleEmployee(emp.id)}
               >
                 <Checkbox checked={isSelected} className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded-[4px] pointer-events-none" />
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-medium ${emp.color} shrink-0`}>
-                  {emp.initials}
-                </div>
-                <div className="flex-1 truncate">
-                  <span className="text-[13px] font-medium text-gray-700">{emp.name}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] font-medium text-gray-800 truncate">{emp.name}</div>
+                  <div className="text-[11px] text-gray-400 truncate">{emp.jobTitle}</div>
                 </div>
                 {isSelected ? (
                   (() => {
@@ -722,7 +1073,7 @@ function ManageHolidaysSheet({
           )}
           <div className="flex gap-4 justify-end">
             <Button variant="outline" className="text-[14px] font-semibold border-gray-300 text-gray-700 hover:bg-gray-50 h-[42px]" onClick={handleMainCancel}>Cancel</Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[14px] h-[42px] shadow-sm" onClick={onClose}>Confirm and save</Button>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[14px] h-[42px] shadow-sm" onClick={onClose}>Save</Button>
           </div>
         </div>
       </SheetContent>
@@ -1172,7 +1523,7 @@ function StateCard({
           </div>
           <div className="border-t border-gray-200 bg-white p-6 flex gap-4 justify-end mt-auto shrink-0 z-10 relative">
             <Button variant="outline" className="text-[14px] font-semibold border-gray-300 text-gray-700 hover:bg-gray-50 h-[42px]" onClick={handleCancelDrawer}>Cancel</Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[14px] h-[42px] shadow-sm" onClick={() => setIsEmployeeDrawerOpen(false)}>Confirm and save</Button>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[14px] h-[42px] shadow-sm" onClick={() => setIsEmployeeDrawerOpen(false)}>Save</Button>
           </div>
         </SheetContent>
       </Sheet>
