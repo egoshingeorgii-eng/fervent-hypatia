@@ -423,9 +423,7 @@ function EmployeeDetailPage({ employee, onBack, allEmployees }: { employee: type
                 <FieldGroup label="Trial period" value="No" />
                 <div />
                 <FieldGroup label="Contractual workdays" value="Tuesday Total: 4.00 hours" />
-                <FieldGroup label="Contractual Vacation days (per year)" value="20" />
                 <FieldGroup label="Additional Payments" value="No" />
-                <FieldGroup label="Remaining vacation days in current year" value="20.5" />
                 <FieldGroup label="Do you have additional employments?" value="This is the only employment" />
                 <div />
                 <FieldGroup label="Is the place of work (federal state) different from the company's location?" value="No" />
@@ -454,73 +452,25 @@ function EmployeeDetailPage({ employee, onBack, allEmployees }: { employee: type
             <div className="px-6 py-5 text-[14px] text-gray-500 italic">Documents content...</div>
           )}
           {activeTab === 'absences' && (
-            <div className="px-6 py-5 space-y-4">
-
-              {/* Card: Vacation entitlement */}
-              <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <div className="px-6 py-2">
+              {/* Card: Vacation details */}
+              <div className="py-6 border-b border-gray-100 last:border-0">
+                <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+                    <div className="w-9 h-9 rounded-md bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
                       <CalendarDays size={18} strokeWidth={2} />
                     </div>
-                    <span className="text-[15px] font-semibold text-gray-900">Vacation entitlement</span>
+                    <span className="text-[16px] font-bold text-gray-900">Vacation details</span>
                   </div>
-                  <Button size="sm" variant="outline" className="text-[12px] font-semibold h-8 flex items-center gap-1.5 text-gray-600">
-                    <FileBadge size={13} /> Edit
+                  <Button size="sm" variant="outline" className="text-[13px] font-medium h-9 px-4 flex items-center gap-2 text-gray-700 border-gray-300 rounded-md">
+                    <FileBadge size={14} /> Edit
                   </Button>
                 </div>
-                <div className="px-5 py-4 grid grid-cols-2 gap-x-16 gap-y-5">
-                  <FieldGroup label="Contractual vacation days (per year)" value="20" />
+                <div className="grid grid-cols-2 gap-x-16 gap-y-6">
+                  <FieldGroup label="Contractual Vacation days (per year)" value="20" />
                   <FieldGroup label="Remaining vacation days in current year" value="20.5" />
-                  <FieldGroup label="Vacation days carried over" value="0.5" />
-                  <FieldGroup label="Vacation calculation method" value="By contract" />
                 </div>
               </div>
-
-              {/* Card: Absence overview */}
-              <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
-                      <Clock3 size={18} strokeWidth={2} />
-                    </div>
-                    <span className="text-[15px] font-semibold text-gray-900">Absence overview</span>
-                  </div>
-                  <Button size="sm" variant="outline" className="text-[12px] font-semibold h-8 flex items-center gap-1.5 text-gray-600">
-                    <FileBadge size={13} /> Edit
-                  </Button>
-                </div>
-                <div className="px-5 py-4 grid grid-cols-2 gap-x-16 gap-y-5">
-                  <FieldGroup label="Sick days this year" value="0" />
-                  <FieldGroup label="Sick days last year" value="0" />
-                  <FieldGroup label="Unpaid leave days this year" value="0" />
-                  <FieldGroup label="Parental leave" value="No" />
-                  <FieldGroup label="Maternity protection" value="No" />
-                  <FieldGroup label="Other absences" value="—" />
-                </div>
-              </div>
-
-              {/* Card: Public holidays */}
-              <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
-                      <Globe size={18} strokeWidth={2} />
-                    </div>
-                    <span className="text-[15px] font-semibold text-gray-900">Public holidays</span>
-                  </div>
-                  <Button size="sm" variant="outline" className="text-[12px] font-semibold h-8 flex items-center gap-1.5 text-gray-600">
-                    <FileBadge size={13} /> Edit
-                  </Button>
-                </div>
-                <div className="px-5 py-4 grid grid-cols-2 gap-x-16 gap-y-5">
-                  <FieldGroup label="Work location (federal state)" value="Bavaria" />
-                  <FieldGroup label="Public holiday schedule" value="Bavaria – 13 holidays" />
-                  <FieldGroup label="Assignment method" value="Default (company-wide)" />
-                  <FieldGroup label="Effective from" value={employee.contractStart} />
-                </div>
-              </div>
-
             </div>
           )}
         </div>
