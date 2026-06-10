@@ -581,47 +581,44 @@ function ManageHolidaysSheet({
                 <AlertTriangle size={18} strokeWidth={2} />
               </div>
               <div className="text-[14px] text-amber-800 flex-1">
-                <span className="font-semibold block mb-0.5">Default state not selected</span>
-                Employees without an explicit assignment will not receive state holidays. Please select a default work location.
-              </div>
-              <div className="relative shrink-0">
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  className="bg-white text-amber-900 border-amber-200 hover:bg-amber-50"
-                  onClick={() => setIsDefaultDropdownOpen(!isDefaultDropdownOpen)}
-                >
-                  Select state
-                </Button>
-                {isDefaultDropdownOpen && (
-                  <div className="absolute top-[100%] mt-2 right-0 w-[240px] bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden flex flex-col max-h-[300px]" onClick={e => e.stopPropagation()}>
-                    <div className="flex items-center px-3 py-2.5 border-b border-gray-100 shrink-0">
-                      <Search size={16} className="text-gray-400 mr-2" />
-                      <input 
-                        type="text" 
-                        placeholder="Search state" 
-                        className="flex-1 outline-none text-[14px] text-gray-700 placeholder:text-gray-400"
-                        value={defaultSearchQuery}
-                        onChange={e => setDefaultSearchQuery(e.target.value)}
-                        autoFocus
-                      />
+                Employees without a default work location won't receive public holidays.
+                <div className="relative mt-3">
+                  <button
+                    className="flex items-center gap-2 text-[14px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                    onClick={() => setIsDefaultDropdownOpen(!isDefaultDropdownOpen)}
+                  >
+                    Select state
+                  </button>
+                  {isDefaultDropdownOpen && (
+                    <div className="absolute top-[100%] mt-2 left-0 w-[240px] bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden flex flex-col max-h-[300px]" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center px-3 py-2.5 border-b border-gray-100 shrink-0">
+                        <Search size={16} className="text-gray-400 mr-2" />
+                        <input
+                          type="text"
+                          placeholder="Search state"
+                          className="flex-1 outline-none text-[14px] text-gray-700 placeholder:text-gray-400"
+                          value={defaultSearchQuery}
+                          onChange={e => setDefaultSearchQuery(e.target.value)}
+                          autoFocus
+                        />
+                      </div>
+                      <div className="overflow-y-auto py-1">
+                        {filteredDefaultStates.map(state => (
+                          <div
+                            key={state}
+                            className="px-4 py-2 text-[14px] text-gray-900 hover:bg-gray-100 cursor-pointer transition-colors"
+                            onClick={() => handleSelectDefault(state)}
+                          >
+                            {state}
+                          </div>
+                        ))}
+                        {filteredDefaultStates.length === 0 && (
+                          <div className="px-4 py-3 text-[14px] text-gray-500 text-center">No states found</div>
+                        )}
+                      </div>
                     </div>
-                    <div className="overflow-y-auto py-1">
-                      {filteredDefaultStates.map(state => (
-                        <div 
-                          key={state}
-                          className="px-4 py-2 text-[14px] text-gray-900 hover:bg-gray-100 cursor-pointer transition-colors"
-                          onClick={() => handleSelectDefault(state)}
-                        >
-                          {state}
-                        </div>
-                      ))}
-                      {filteredDefaultStates.length === 0 && (
-                        <div className="px-4 py-3 text-[14px] text-gray-500 text-center">No states found</div>
-                      )}
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -723,9 +720,9 @@ function ManageHolidaysSheet({
                </p>
             </div>
           )}
-          <div className="flex gap-4">
-            <Button variant="outline" className="flex-1 text-[14px] font-semibold border-gray-300 text-gray-700 hover:bg-gray-50 h-[42px]" onClick={handleMainCancel}>Cancel</Button>
-            <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[14px] h-[42px] shadow-sm" onClick={onClose}>Confirm and save</Button>
+          <div className="flex gap-4 justify-end">
+            <Button variant="outline" className="text-[14px] font-semibold border-gray-300 text-gray-700 hover:bg-gray-50 h-[42px]" onClick={handleMainCancel}>Cancel</Button>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[14px] h-[42px] shadow-sm" onClick={onClose}>Confirm and save</Button>
           </div>
         </div>
       </SheetContent>
@@ -1173,9 +1170,9 @@ function StateCard({
               })}
             </div>
           </div>
-          <div className="border-t border-gray-200 bg-white p-6 flex gap-4 mt-auto shrink-0 z-10 relative">
-            <Button variant="outline" className="flex-1 text-[14px] font-semibold border-gray-300 text-gray-700 hover:bg-gray-50 h-[42px]" onClick={handleCancelDrawer}>Cancel</Button>
-            <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[14px] h-[42px] shadow-sm" onClick={() => setIsEmployeeDrawerOpen(false)}>Confirm and save</Button>
+          <div className="border-t border-gray-200 bg-white p-6 flex gap-4 justify-end mt-auto shrink-0 z-10 relative">
+            <Button variant="outline" className="text-[14px] font-semibold border-gray-300 text-gray-700 hover:bg-gray-50 h-[42px]" onClick={handleCancelDrawer}>Cancel</Button>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[14px] h-[42px] shadow-sm" onClick={() => setIsEmployeeDrawerOpen(false)}>Confirm and save</Button>
           </div>
         </SheetContent>
       </Sheet>
