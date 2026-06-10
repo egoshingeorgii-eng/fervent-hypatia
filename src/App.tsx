@@ -320,7 +320,7 @@ function PeoplePage({ employees, onSelectEmployee }: { employees: typeof PEOPLE_
 
 // ─── Employee Detail Page ─────────────────────────────────────────────────────
 function EmployeeDetailPage({ employee, onBack, allEmployees }: { employee: typeof PEOPLE_EMPLOYEES[0], onBack: () => void, allEmployees: typeof PEOPLE_EMPLOYEES }) {
-  const [activeTab, setActiveTab] = useState<'masterdata' | 'employment' | 'payment' | 'documents' | 'absences'>('employment');
+  const [activeTab, setActiveTab] = useState<'masterdata' | 'employment' | 'payment' | 'documents'>('employment');
   const currentIndex = allEmployees.findIndex(e => e.id === employee.id);
   const total = allEmployees.length;
 
@@ -370,7 +370,6 @@ function EmployeeDetailPage({ employee, onBack, allEmployees }: { employee: type
                 { key: 'employment', label: 'Employment', badge: '2' },
                 { key: 'payment', label: 'Payment' },
                 { key: 'documents', label: 'Documents' },
-                { key: 'absences', label: 'Absences' },
               ].map(tab => (
                 <button
                   key={tab.key}
@@ -426,8 +425,6 @@ function EmployeeDetailPage({ employee, onBack, allEmployees }: { employee: type
                 <FieldGroup label="Additional Payments" value="No" />
                 <FieldGroup label="Do you have additional employments?" value="This is the only employment" />
                 <div />
-                <FieldGroup label="Is the place of work (federal state) different from the company's location?" value="No" />
-                <div />
                 <FieldGroup label="Cost center" value="—" />
                 <FieldGroup label="Cost unit" value="—" />
                 <FieldGroup label="Comment field (employee)" value="—" />
@@ -436,7 +433,27 @@ function EmployeeDetailPage({ employee, onBack, allEmployees }: { employee: type
                 <div />
               </div>
 
-              <button className="mt-6 flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+              {/* Absences Section inside Employment */}
+              <div className="mt-8 pt-8 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-md bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+                      <CalendarDays size={18} strokeWidth={2} />
+                    </div>
+                    <span className="text-[16px] font-bold text-gray-900">Absences</span>
+                  </div>
+                  <Button size="sm" variant="outline" className="text-[13px] font-medium h-9 px-4 flex items-center gap-2 text-gray-700 border-gray-300 rounded-md">
+                    <FileBadge size={14} /> Edit
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-x-16 gap-y-6">
+                  <FieldGroup label="Contractual Vacation days (per year)" value="20" />
+                  <FieldGroup label="Remaining vacation days in current year" value="20.5" />
+                  <FieldGroup label="Is the place of work (federal state) different from the company's location?" value="No" />
+                </div>
+              </div>
+
+              <button className="mt-8 flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                 <Plus size={14} className="text-blue-600" /> Create a new contract
               </button>
             </div>
@@ -450,28 +467,6 @@ function EmployeeDetailPage({ employee, onBack, allEmployees }: { employee: type
           )}
           {activeTab === 'documents' && (
             <div className="px-6 py-5 text-[14px] text-gray-500 italic">Documents content...</div>
-          )}
-          {activeTab === 'absences' && (
-            <div className="px-6 py-2">
-              {/* Card: Vacation details */}
-              <div className="py-6 border-b border-gray-100 last:border-0">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-md bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
-                      <CalendarDays size={18} strokeWidth={2} />
-                    </div>
-                    <span className="text-[16px] font-bold text-gray-900">Vacation details</span>
-                  </div>
-                  <Button size="sm" variant="outline" className="text-[13px] font-medium h-9 px-4 flex items-center gap-2 text-gray-700 border-gray-300 rounded-md">
-                    <FileBadge size={14} /> Edit
-                  </Button>
-                </div>
-                <div className="grid grid-cols-2 gap-x-16 gap-y-6">
-                  <FieldGroup label="Contractual Vacation days (per year)" value="20" />
-                  <FieldGroup label="Remaining vacation days in current year" value="20.5" />
-                </div>
-              </div>
-            </div>
           )}
         </div>
 
