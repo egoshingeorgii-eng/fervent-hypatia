@@ -267,28 +267,31 @@ function EmployeesPopover({
             />
           </div>
         </div>
-        <div className="max-h-[400px] overflow-y-auto py-1">
+        <div 
+          style={{ maxHeight: '320px', overflowY: 'auto' }}
+          onWheel={(e) => e.stopPropagation()}
+          className="py-1"
+        >
+          {sortedEmployees.length === 0 && (
+            <div className="px-4 py-8 text-center text-gray-500 text-[13px]">No employees found</div>
+          )}
           {sortedEmployees.map((emp) => {
             const isSelected = selectedEmployees.includes(emp.id);
             const explicitState = Object.keys(employeeAssignments).find(s => s !== '__unassigned__' && employeeAssignments[s]?.includes(emp.id));
             const isUnassigned = employeeAssignments['__unassigned__']?.includes(emp.id);
             const currentState = explicitState || (isUnassigned ? null : defaultState);
             const isAssignedElsewhere = currentState && currentState !== stateName && !isSelected;
-
             return (
-              <div 
+              <div
                 key={emp.id}
-                className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors group"
+                className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
                 onClick={() => onToggleEmployee(emp.id)}
               >
-                <Checkbox 
-                  checked={isSelected} 
-                  className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded-[4px] pointer-events-none"
-                />
+                <Checkbox checked={isSelected} className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded-[4px] pointer-events-none" />
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-medium ${emp.color} shrink-0`}>
                   {emp.initials}
                 </div>
-                <div className="flex flex-col flex-1 truncate">
+                <div className="flex-1 truncate">
                   <span className="text-[13px] font-medium text-gray-700">{emp.name}</span>
                 </div>
                 {isSelected ? (
@@ -296,34 +299,24 @@ function EmployeesPopover({
                     if (!popoverSnapshot) return null;
                     const snapAssignments = popoverSnapshot.employeeAssignments;
                     const snapDefault = popoverSnapshot.defaultState;
-                    
                     const initialExplicitState = Object.keys(snapAssignments).find(s => s !== '__unassigned__' && snapAssignments[s]?.includes(emp.id));
                     const isInitialUnassigned = snapAssignments['__unassigned__']?.includes(emp.id);
                     const initialState = initialExplicitState || (isInitialUnassigned ? null : snapDefault);
-                    
-                    // Show badge only if the state was changed to this state
                     if (initialState && initialState !== stateName) {
                       return (
-                        <div className="flex items-center gap-1.5 px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded shrink-0 text-[11px] font-medium">
-                          <span>{stateName}</span>
+                        <div className="flex items-center px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded shrink-0 text-[11px] font-medium">
+                          {stateName}
                         </div>
                       );
                     }
-                    return null; // No badge for already selected
+                    return null;
                   })()
                 ) : isAssignedElsewhere ? (
-                  <span className="text-[11px] text-gray-500 font-medium px-1.5 py-0.5 bg-gray-100 rounded shrink-0">
-                    {currentState}
-                  </span>
+                  <span className="text-[11px] text-gray-500 font-medium px-1.5 py-0.5 bg-gray-100 rounded shrink-0">{currentState}</span>
                 ) : null}
               </div>
             );
           })}
-          {sortedEmployees.length === 0 && (
-            <div className="px-4 py-8 text-center text-gray-500 text-[13px]">
-              No employees found
-            </div>
-          )}
         </div>
       </PopoverContent>
     </Popover>
@@ -444,18 +437,18 @@ function ManageHolidaysSheet({
 
   const getMockHolidays = (stateName: string) => {
     if (stateName === 'Bavaria') return [
-      { name: "Heilige Drei Könige", date: "6. January", checked: true },
-      { name: "Fronleichnam", date: "04/06/2026, 27/05/2027", checked: true },
-      { name: "Mariä Himmelfahrt", date: "15. August", checked: true },
-      { name: "Allerheiligen", date: "1. November", checked: true }
+      { name: "Heilige Drei Könige", date: "6 Jan", checked: true },
+      { name: "Fronleichnam", date: "4 Jun 2026, 27 May 2027", checked: true },
+      { name: "Mariä Himmelfahrt", date: "15 Aug", checked: true },
+      { name: "Allerheiligen", date: "1 Nov", checked: true }
     ];
     if (stateName === 'Berlin') return [
-      { name: "Example 1", date: "DD.MM.YYYY", checked: false },
-      { name: "Example 2", date: "DD.MM.YYYY", checked: false }
+      { name: "Example 1", date: "10 May", checked: false },
+      { name: "Example 2", date: "11 May", checked: false }
     ];
     return [
-      { name: "Example 1", date: "DD.MM.YYYY", checked: true },
-      { name: "Example 2", date: "DD.MM.YYYY", checked: true }
+      { name: "Example 1", date: "10 May", checked: true },
+      { name: "Example 2", date: "11 May", checked: true }
     ];
   };
 
@@ -677,14 +670,14 @@ function NationalCard() {
   const handleAddInternalHoliday = () => {
     setInternalHolidays([
       ...internalHolidays,
-      { name: "Company Anniversary", date: "DD.MM.YYYY" }
+      { name: "Company Anniversary", date: "1 Sep" }
     ]);
   };
   
   const allHolidays = [
-    { name: "Example 1", date: "DD.MM.YYYY", checked: true },
-    { name: "Example 2", date: "DD.MM.YYYY", checked: true },
-    { name: "Example 3", date: "DD.MM.YYYY", checked: true }
+    { name: "Example 1", date: "1 Jan", checked: true },
+    { name: "Example 2", date: "2 Jan", checked: true },
+    { name: "Example 3", date: "3 Jan", checked: true }
   ];
   
   return (
@@ -756,7 +749,7 @@ function HolidayRow({ name, date, checked, deletable, hideCheckbox, onDelete }: 
         <label htmlFor={name} className={`text-[14px] font-medium text-gray-900 ${hideCheckbox ? '' : 'cursor-pointer'}`}>{name}</label>
       </div>
       <div className="flex items-center gap-3">
-        {date && <span className="text-[13px] text-gray-400 uppercase tracking-wide">{date}</span>}
+        {date && <span className="text-[13px] text-gray-400">{date}</span>}
         {deletable && (
           <button 
             className="text-gray-400 hover:text-red-500 transition-colors"
