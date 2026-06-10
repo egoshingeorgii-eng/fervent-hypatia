@@ -386,10 +386,25 @@ function ManageHolidaysSheet({
   };
 
   const handleSelectDefault = (stateName: string) => {
+    const oldDefault = defaultState;
     setDefaultState(stateName);
-    if (!activeStates.includes(stateName)) {
-      setActiveStates([...activeStates, stateName]);
+
+    let newActiveStates = [...activeStates];
+
+    // Remove old default state if it has no explicit employee assignments
+    if (oldDefault && oldDefault !== stateName) {
+      const hasExplicitAssignments = (employeeAssignments[oldDefault] || []).length > 0;
+      if (!hasExplicitAssignments) {
+        newActiveStates = newActiveStates.filter(s => s !== oldDefault);
+      }
     }
+
+    // Add new default state if not already in list
+    if (!newActiveStates.includes(stateName)) {
+      newActiveStates = [...newActiveStates, stateName];
+    }
+
+    setActiveStates(newActiveStates);
     setIsDefaultDropdownOpen(false);
     setDefaultSearchQuery("");
   };
@@ -436,19 +451,70 @@ function ManageHolidaysSheet({
   const filteredDefaultStates = GERMAN_STATES.filter(s => s.toLowerCase().includes(defaultSearchQuery.toLowerCase()));
 
   const getMockHolidays = (stateName: string) => {
-    if (stateName === 'Bavaria') return [
-      { name: "Heilige Drei Könige", date: "6 Jan", checked: true },
-      { name: "Fronleichnam", date: "4 Jun 2026, 27 May 2027", checked: true },
-      { name: "Mariä Himmelfahrt", date: "15 Aug", checked: true },
-      { name: "Allerheiligen", date: "1 Nov", checked: true }
-    ];
-    if (stateName === 'Berlin') return [
-      { name: "Example 1", date: "10 May", checked: false },
-      { name: "Example 2", date: "11 May", checked: false }
-    ];
-    return [
-      { name: "Example 1", date: "10 May", checked: true },
-      { name: "Example 2", date: "11 May", checked: true }
+    const holidays: Record<string, { name: string; date: string; checked: boolean }[]> = {
+      'Baden-Württemberg': [
+        { name: "Heilige Drei Könige", date: "6 Jan", checked: true },
+        { name: "Fronleichnam", date: "4 Jun", checked: true },
+        { name: "Allerheiligen", date: "1 Nov", checked: true },
+      ],
+      'Bavaria': [
+        { name: "Heilige Drei Könige", date: "6 Jan", checked: true },
+        { name: "Fronleichnam", date: "4 Jun", checked: true },
+        { name: "Mariä Himmelfahrt", date: "15 Aug", checked: true },
+        { name: "Allerheiligen", date: "1 Nov", checked: true },
+      ],
+      'Berlin': [
+        { name: "Internationaler Frauentag", date: "8 Mar", checked: true },
+      ],
+      'Brandenburg': [
+        { name: "Reformationstag", date: "31 Oct", checked: true },
+      ],
+      'Bremen': [
+        { name: "Reformationstag", date: "31 Oct", checked: true },
+      ],
+      'Hamburg': [
+        { name: "Reformationstag", date: "31 Oct", checked: true },
+      ],
+      'Hesse': [
+        { name: "Fronleichnam", date: "4 Jun", checked: true },
+      ],
+      'Lower Saxony': [
+        { name: "Reformationstag", date: "31 Oct", checked: true },
+      ],
+      'Mecklenburg-Vorpommern': [
+        { name: "Reformationstag", date: "31 Oct", checked: true },
+      ],
+      'North Rhine-Westphalia': [
+        { name: "Fronleichnam", date: "4 Jun", checked: true },
+        { name: "Allerheiligen", date: "1 Nov", checked: true },
+      ],
+      'Rhineland-Palatinate': [
+        { name: "Fronleichnam", date: "4 Jun", checked: true },
+        { name: "Allerheiligen", date: "1 Nov", checked: true },
+      ],
+      'Saarland': [
+        { name: "Fronleichnam", date: "4 Jun", checked: true },
+        { name: "Mariä Himmelfahrt", date: "15 Aug", checked: true },
+        { name: "Allerheiligen", date: "1 Nov", checked: true },
+      ],
+      'Saxony': [
+        { name: "Reformationstag", date: "31 Oct", checked: true },
+        { name: "Buß- und Bettag", date: "18 Nov", checked: true },
+      ],
+      'Saxony-Anhalt': [
+        { name: "Heilige Drei Könige", date: "6 Jan", checked: true },
+        { name: "Reformationstag", date: "31 Oct", checked: true },
+      ],
+      'Schleswig-Holstein': [
+        { name: "Reformationstag", date: "31 Oct", checked: true },
+      ],
+      'Thuringia': [
+        { name: "Weltkindertag", date: "20 Sep", checked: true },
+        { name: "Reformationstag", date: "31 Oct", checked: true },
+      ],
+    };
+    return holidays[stateName] ?? [
+      { name: "Reformationstag", date: "31 Oct", checked: true },
     ];
   };
 
@@ -566,7 +632,11 @@ function ManageHolidaysSheet({
           {/* SECTION 2: State holidays */}
           <section className="space-y-4">
             <div className="space-y-4 relative" ref={dropdownRef}>
-              {activeStates.map(stateName => {
+              {[...activeStates].sort((a, b) => {
+                if (a === defaultState) return -1;
+                if (b === defaultState) return 1;
+                return 0;
+              }).map(stateName => {
                 const isDefault = defaultState === stateName;
                 const explicitEmployees = employeeAssignments[stateName] || [];
                 const implicitEmployees = ALL_EMPLOYEES.filter(emp => !Object.values(employeeAssignments).some(list => list.includes(emp.id))).map(e => e.id);
