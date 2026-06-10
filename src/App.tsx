@@ -1,0 +1,1148 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { 
+  Home, UserPlus, Users, Clock, CalendarDays, Folder, User, Sparkles, 
+  HelpCircle, ChevronDown, Check, Clock3, Globe, MapPin, MapPinHouse, Trash2, Plus, 
+  AlertTriangle, Search, PlusCircle, ChevronUp, X, Info
+} from "lucide-react";
+
+const GERMAN_STATES = [
+  "Baden-Württemberg", "Bavaria", "Berlin", "Brandenburg", "Bremen", "Hamburg", "Hesse", 
+  "Lower Saxony", "Mecklenburg-Vorpommern", "North Rhine-Westphalia", "Rhineland-Palatinate", 
+  "Saarland", "Saxony", "Saxony-Anhalt", "Schleswig-Holstein", "Thuringia"
+];
+
+// Facepile data
+const ALL_EMPLOYEES = [
+  { id: '1', initials: 'MJ', color: 'bg-blue-500', name: 'Maria Jensen' },
+  { id: '2', initials: 'SP', color: 'bg-teal-500', name: 'Stefan Petrov' },
+  { id: '3', initials: 'DR', color: 'bg-purple-500', name: 'Diana Richter' },
+  { id: '4', initials: 'JD', color: 'bg-orange-500', name: 'John Doe' },
+  { id: '5', initials: 'AS', color: 'bg-pink-500', name: 'Anna Smith' },
+  { id: '6', initials: 'TM', color: 'bg-red-500', name: 'Thomas Müller' },
+  { id: '7', initials: 'LW', color: 'bg-indigo-500', name: 'Laura Weber' },
+  { id: '8', initials: 'KF', color: 'bg-cyan-500', name: 'Kevin Fischer' },
+  { id: '9', initials: 'SW', color: 'bg-emerald-500', name: 'Sarah Wagner' },
+  { id: '10', initials: 'MB', color: 'bg-violet-500', name: 'Michael Becker' },
+  { id: '11', initials: 'JH', color: 'bg-rose-500', name: 'Julia Hoffmann' },
+  { id: '12', initials: 'DS', color: 'bg-amber-500', name: 'David Schäfer' },
+  { id: '13', initials: 'NK', color: 'bg-lime-500', name: 'Nina Koch' },
+  { id: '14', initials: 'PB', color: 'bg-sky-500', name: 'Paul Bauer' },
+  { id: '15', initials: 'LK', color: 'bg-fuchsia-500', name: 'Lisa Klein' },
+  { id: '16', initials: 'MW', color: 'bg-stone-500', name: 'Markus Wolf' },
+  { id: '17', initials: 'SN', color: 'bg-green-500', name: 'Sophie Neumann' },
+  { id: '18', initials: 'CS', color: 'bg-yellow-500', name: 'Christian Schwarz' },
+  { id: '19', initials: 'EZ', color: 'bg-zinc-500', name: 'Emma Zimmermann' },
+  { id: '20', initials: 'AK', color: 'bg-slate-500', name: 'Alexander Krüger' },
+  { id: '21', initials: 'LH', color: 'bg-blue-400', name: 'Leon Hofmann' },
+  { id: '22', initials: 'MW', color: 'bg-purple-400', name: 'Mia Werner' },
+  { id: '23', initials: 'FL', color: 'bg-teal-400', name: 'Felix Lange' },
+  { id: '24', initials: 'CM', color: 'bg-orange-400', name: 'Clara Meyer' }
+];
+
+function NavItem({ icon, label, active, badge, badgeColor = "bg-gray-200 text-gray-700" }: { icon: React.ReactNode, label: string, active?: boolean, badge?: string, badgeColor?: string }) {
+  return (
+    <div className={`flex items-center gap-3 p-2 rounded cursor-pointer text-sm font-medium ${active ? 'bg-gray-300 text-gray-900' : 'hover:bg-gray-300 text-gray-600'}`}>
+      {icon}
+      <span className="flex-1">{label}</span>
+      {badge && <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${badgeColor}`}>{badge}</span>}
+    </div>
+  );
+}
+
+export default function App() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [defaultState, setDefaultState] = useState<string | null>('Bavaria');
+  const [activeStates, setActiveStates] = useState<string[]>(['Bavaria', 'Berlin']);
+  const [employeeAssignments, setEmployeeAssignments] = useState<Record<string, string[]>>({});
+  const [uiVariant, setUiVariant] = useState<'drawer' | 'popover'>('popover');
+
+  return (
+    <TooltipProvider delayDuration={300}>
+      <div className="flex h-screen bg-[#f3f4f6]">
+        {/* Sidebar */}
+      <aside className="w-[240px] bg-[#e5e7eb] flex flex-col h-full shrink-0">
+        <div className="p-4 flex-1 overflow-y-auto space-y-1">
+          <NavItem icon={<Home size={18} />} label="Overview" />
+          <NavItem icon={<UserPlus size={18} />} label="Add new employee" />
+          <NavItem icon={<Users size={18} />} label="People" />
+          <NavItem icon={<Clock size={18} />} label="Time tracking" />
+          <NavItem icon={<CalendarDays size={18} />} label="Absences" active />
+          <NavItem icon={<Folder size={18} />} label="Files" />
+          <NavItem icon={<User size={18} />} label="Employee space" />
+          <NavItem icon={<Sparkles size={18} />} label="Rita assistant" badge="BETA" />
+        </div>
+        <div className="p-4 space-y-2 mt-auto">
+          <NavItem icon={<HelpCircle size={18} />} label="Help Center" badge="NEW" badgeColor="bg-blue-200 text-blue-800" />
+          <div className="flex items-center gap-2 p-2 hover:bg-gray-300 rounded cursor-pointer mt-2 text-sm font-medium">
+            <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-[10px]">FF</div>
+            <span className="flex-1 truncate">Fahrschule Fürste...</span>
+            <ChevronDown size={16} />
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto bg-[#f3f4f6]">
+        <div className="p-8 max-w-6xl mx-auto space-y-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold text-gray-900">Absences</h1>
+            <Button variant="outline" onClick={() => setIsModalOpen(true)}>Manage holidays</Button>
+          </div>
+
+          {/* Debug Panel */}
+          <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-3 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[13px] font-medium text-gray-500 uppercase tracking-wider">Debug Scenarios</p>
+              <div className="flex bg-gray-100 p-0.5 rounded-md border border-gray-200">
+                <button 
+                  className={`px-3 py-1 text-[12px] font-medium rounded-sm transition-colors ${uiVariant === 'drawer' ? 'bg-white shadow-sm text-gray-900 border border-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
+                  onClick={() => setUiVariant('drawer')}
+                >
+                  Drawer UI
+                </button>
+                <button 
+                  className={`px-3 py-1 text-[12px] font-medium rounded-sm transition-colors ${uiVariant === 'popover' ? 'bg-white shadow-sm text-gray-900 border border-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
+                  onClick={() => setUiVariant('popover')}
+                >
+                  Popover UI
+                </button>
+              </div>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <Button variant="outline" size="sm" className="text-orange-700 border-orange-200 bg-orange-50 hover:bg-orange-100" onClick={() => { 
+                setDefaultState('Bavaria'); 
+                setActiveStates(['Bavaria']); 
+                setEmployeeAssignments({}); 
+                setIsModalOpen(true);
+              }}>1. Default State</Button>
+              
+              <Button variant="outline" size="sm" className="text-orange-700 border-orange-200 bg-orange-50 hover:bg-orange-100" onClick={() => { 
+                setDefaultState('Bavaria'); 
+                setActiveStates(['Bavaria', 'Berlin']); 
+                setEmployeeAssignments({'Berlin': ['1', '2']}); 
+                setIsModalOpen(true);
+              }}>2. Default + Overrides</Button>
+
+              <Button variant="outline" size="sm" className="text-orange-700 border-orange-200 bg-orange-50 hover:bg-orange-100" onClick={() => { 
+                setDefaultState(null); 
+                setActiveStates(['Berlin', 'Hamburg']); 
+                setEmployeeAssignments({'Berlin': ['1', '2'], 'Hamburg': ['3']}); 
+                setIsModalOpen(true);
+              }}>3. No Default</Button>
+              
+              <Button variant="outline" size="sm" className="text-orange-700 border-orange-200 bg-orange-50 hover:bg-orange-100" onClick={() => { 
+                setDefaultState(null); 
+                setActiveStates([]); 
+                setEmployeeAssignments({}); 
+                setIsModalOpen(true);
+              }}>4. Empty State</Button>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <div className="flex-1 bg-gray-200/50 border border-gray-200 rounded-xl p-6 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <Clock3 size={20} />
+              </div>
+              <span className="text-gray-500 font-medium">No pending requests</span>
+            </div>
+            <div className="w-64 bg-gray-200/50 border border-gray-200 rounded-xl p-6 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <Check size={20} />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 pt-4">
+            <h2 className="text-lg font-semibold text-gray-900">Overview</h2>
+            
+            <div className="flex gap-6 border-b border-gray-200 text-sm font-medium">
+              <div className="pb-2 border-b-2 border-gray-900 text-gray-900">Overview</div>
+              <div className="pb-2 text-gray-500 cursor-pointer">Pending</div>
+              <div className="pb-2 text-gray-500 cursor-pointer">Approved</div>
+              <div className="pb-2 text-gray-500 cursor-pointer">Declined</div>
+            </div>
+
+            <div className="bg-gray-100/50 rounded-lg border border-gray-200 overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="w-12 text-xs font-semibold text-gray-500 uppercase">ID</TableHead>
+                    <TableHead className="text-xs font-semibold text-gray-500 uppercase">LAST NAME ↑</TableHead>
+                    <TableHead className="text-xs font-semibold text-gray-500 uppercase border-r">FIRST NAME</TableHead>
+                    {[...Array(13)].map((_, i) => (
+                      <TableHead key={i} className={`p-0 min-w-[32px] text-center text-[10px] uppercase font-semibold ${i === 8 ? 'bg-blue-100/50 text-blue-600' : 'text-gray-500'}`}>
+                        <div className="flex flex-col items-center justify-center h-full">
+                          <span>{['Mo','Tu','We','Th','Fr','Sa','Su'][i % 7]}</span>
+                          <span className={i === 8 ? "text-blue-600" : "text-gray-900"}>{i + 1}</span>
+                        </div>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow className="hover:bg-transparent border-b-gray-200">
+                    <TableCell className="font-medium text-right text-gray-500">5</TableCell>
+                    <TableCell className="font-medium">Balotelli</TableCell>
+                    <TableCell className="font-medium border-r">Mario</TableCell>
+                    {[...Array(13)].map((_, i) => (
+                      <TableCell key={i} className={`p-0 border-r border-gray-200/50 ${i === 3 ? 'bg-purple-100/50' : i === 8 ? 'bg-blue-100/50' : i === 4 || i === 5 ? 'bg-gray-200/30' : ''}`}></TableCell>
+                    ))}
+                  </TableRow>
+                </TableBody>
+              </Table>
+              <div className="p-4 text-xs text-gray-500">
+                Showing <span className="font-medium text-gray-700">1</span> of 1 items
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Sheet Wrapper */}
+      <ManageHolidaysSheet 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        defaultState={defaultState} 
+        setDefaultState={setDefaultState} 
+        activeStates={activeStates} 
+        setActiveStates={setActiveStates}
+        employeeAssignments={employeeAssignments}
+        setEmployeeAssignments={setEmployeeAssignments}
+        uiVariant={uiVariant}
+      />
+    </div>
+    </TooltipProvider>
+  );
+}
+
+function EmployeesPopover({ 
+  stateName,
+  selectedEmployees,
+  onToggleEmployee,
+  employeeAssignments,
+  defaultState,
+  children 
+}: { 
+  stateName: string;
+  selectedEmployees: string[];
+  onToggleEmployee: (empId: string) => void;
+  employeeAssignments: Record<string, string[]>;
+  defaultState: string | null;
+  children: React.ReactNode;
+}) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [initialSortOrder, setInitialSortOrder] = useState<string[]>([]);
+  const [popoverSnapshot, setPopoverSnapshot] = useState<{
+    employeeAssignments: Record<string, string[]>;
+    defaultState: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setPopoverSnapshot({ employeeAssignments, defaultState });
+      const getCat = (emp: typeof ALL_EMPLOYEES[0]) => {
+        const explicitState = Object.keys(employeeAssignments).find(s => s !== '__unassigned__' && employeeAssignments[s]?.includes(emp.id));
+        const isUnassigned = employeeAssignments['__unassigned__']?.includes(emp.id);
+        const currentState = explicitState || (isUnassigned ? null : defaultState);
+        
+        if (!currentState) return 0; // пустые
+        if (selectedEmployees.includes(emp.id)) return 1; // подходящие под state
+        return 2; // остальные
+      };
+
+      const order = [...ALL_EMPLOYEES].sort((a, b) => {
+        const catA = getCat(a);
+        const catB = getCat(b);
+        if (catA !== catB) return catA - catB;
+        return a.name.localeCompare(b.name);
+      }).map(e => e.id);
+
+      setInitialSortOrder(order);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  const filteredEmployees = ALL_EMPLOYEES.filter(emp => emp.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const sortedEmployees = [...filteredEmployees].sort((a, b) => {
+    if (initialSortOrder.length > 0) {
+      return initialSortOrder.indexOf(a.id) - initialSortOrder.indexOf(b.id);
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        {children}
+      </PopoverTrigger>
+      <PopoverContent 
+        className="w-[320px] p-0 shadow-xl border-gray-200 z-[100]" 
+        align="end"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-3 border-b border-gray-100 bg-gray-50 rounded-t-md">
+          <div className="text-[14px] font-semibold text-gray-900 mb-2 px-1">Assign to {stateName}</div>
+          <div className="flex items-center px-3 py-2 border border-gray-200 rounded-md bg-white focus-within:border-blue-500 transition-colors shadow-sm">
+            <Search size={14} className="text-gray-400 mr-2" />
+            <input 
+              type="text" 
+              placeholder="Search employees..." 
+              className="flex-1 outline-none text-[13px] bg-transparent text-gray-900 placeholder:text-gray-400"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="max-h-[400px] overflow-y-auto py-1">
+          {sortedEmployees.map((emp) => {
+            const isSelected = selectedEmployees.includes(emp.id);
+            const explicitState = Object.keys(employeeAssignments).find(s => s !== '__unassigned__' && employeeAssignments[s]?.includes(emp.id));
+            const isUnassigned = employeeAssignments['__unassigned__']?.includes(emp.id);
+            const currentState = explicitState || (isUnassigned ? null : defaultState);
+            const isAssignedElsewhere = currentState && currentState !== stateName && !isSelected;
+
+            return (
+              <div 
+                key={emp.id}
+                className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors group"
+                onClick={() => onToggleEmployee(emp.id)}
+              >
+                <Checkbox 
+                  checked={isSelected} 
+                  className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded-[4px] pointer-events-none"
+                />
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-medium ${emp.color} shrink-0`}>
+                  {emp.initials}
+                </div>
+                <div className="flex flex-col flex-1 truncate">
+                  <span className="text-[13px] font-medium text-gray-700">{emp.name}</span>
+                </div>
+                {isSelected ? (
+                  (() => {
+                    if (!popoverSnapshot) return null;
+                    const snapAssignments = popoverSnapshot.employeeAssignments;
+                    const snapDefault = popoverSnapshot.defaultState;
+                    
+                    const initialExplicitState = Object.keys(snapAssignments).find(s => s !== '__unassigned__' && snapAssignments[s]?.includes(emp.id));
+                    const isInitialUnassigned = snapAssignments['__unassigned__']?.includes(emp.id);
+                    const initialState = initialExplicitState || (isInitialUnassigned ? null : snapDefault);
+                    
+                    // Show badge only if the state was changed to this state
+                    if (initialState && initialState !== stateName) {
+                      return (
+                        <div className="flex items-center gap-1.5 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded shrink-0 text-[11px] font-medium">
+                          <span className="line-through opacity-70">{initialState}</span>
+                          <span>→</span>
+                          <span>{stateName}</span>
+                        </div>
+                      );
+                    }
+                    return null; // No badge for already selected
+                  })()
+                ) : isAssignedElsewhere ? (
+                  <span className="text-[11px] text-gray-500 font-medium px-1.5 py-0.5 bg-gray-100 rounded shrink-0">
+                    {currentState}
+                  </span>
+                ) : null}
+              </div>
+            );
+          })}
+          {sortedEmployees.length === 0 && (
+            <div className="px-4 py-8 text-center text-gray-500 text-[13px]">
+              No employees found
+            </div>
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function ManageHolidaysSheet({ 
+  isOpen, onClose, defaultState, setDefaultState, activeStates, setActiveStates, 
+  employeeAssignments, setEmployeeAssignments, uiVariant 
+}: { 
+  isOpen: boolean, onClose: () => void, defaultState: string | null, setDefaultState: (state: string | null) => void, 
+  activeStates: string[], setActiveStates: (states: string[]) => void,
+  employeeAssignments: Record<string, string[]>, setEmployeeAssignments: (assignments: Record<string, string[]>) => void,
+  uiVariant: 'drawer' | 'popover'
+}) {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  const [mainSnapshot, setMainSnapshot] = useState<{
+    defaultState: string | null;
+    activeStates: string[];
+    employeeAssignments: Record<string, string[]>;
+  } | null>(null);
+
+  const [originalDefaultState, setOriginalDefaultState] = useState(defaultState);
+
+  useEffect(() => {
+    if (isOpen) {
+      setMainSnapshot({ defaultState, activeStates, employeeAssignments });
+      setOriginalDefaultState(defaultState);
+    }
+  }, [isOpen]);
+
+  const handleMainCancel = () => {
+    if (mainSnapshot) {
+      setDefaultState(mainSnapshot.defaultState);
+      setActiveStates(mainSnapshot.activeStates);
+      setEmployeeAssignments(mainSnapshot.employeeAssignments);
+    }
+    onClose();
+  };
+
+  const [isDefaultDropdownOpen, setIsDefaultDropdownOpen] = useState(false);
+  const [defaultSearchQuery, setDefaultSearchQuery] = useState("");
+  const defaultDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+      if (defaultDropdownRef.current && !defaultDropdownRef.current.contains(event.target as Node)) {
+        setIsDefaultDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelectState = (stateName: string) => {
+    if (!activeStates.includes(stateName)) {
+      setActiveStates([...activeStates, stateName]);
+    }
+    setIsDropdownOpen(false);
+    setSearchQuery("");
+  };
+
+  const handleSelectDefault = (stateName: string) => {
+    setDefaultState(stateName);
+    if (!activeStates.includes(stateName)) {
+      setActiveStates([...activeStates, stateName]);
+    }
+    setIsDefaultDropdownOpen(false);
+    setDefaultSearchQuery("");
+  };
+
+  const toggleEmployee = (stateName: string, empId: string) => {
+    let oldState: string | null = null;
+    for (const s of Object.keys(employeeAssignments)) {
+      if (employeeAssignments[s]?.includes(empId)) {
+        oldState = s;
+        break;
+      }
+    }
+
+    const currentAssigned = employeeAssignments[stateName] || [];
+    const isCurrentlyAssigned = currentAssigned.includes(empId);
+    const isDefault = stateName === defaultState;
+    const isVisuallyAssigned = isCurrentlyAssigned || (isDefault && oldState !== '__unassigned__' && !oldState);
+
+    const newAssignments = { ...employeeAssignments };
+    const newActiveStates = [...activeStates];
+
+    if (isVisuallyAssigned) {
+      if (isCurrentlyAssigned) {
+        newAssignments[stateName] = currentAssigned.filter(id => id !== empId);
+        // showAlert(`Removed ${empName} from ${stateName}`);
+      }
+      
+      if (isDefault) {
+        newAssignments['__unassigned__'] = [...(newAssignments['__unassigned__'] || []), empId];
+      }
+    } else {
+      if (oldState) {
+        newAssignments[oldState] = newAssignments[oldState].filter(id => id !== empId);
+        // showAlert(`Moved ${empName} from ${oldState} to ${stateName}`);
+      }
+      newAssignments[stateName] = [...currentAssigned, empId];
+    }
+
+    setEmployeeAssignments(newAssignments);
+    setActiveStates(newActiveStates);
+  };
+
+  const filteredStates = GERMAN_STATES.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredDefaultStates = GERMAN_STATES.filter(s => s.toLowerCase().includes(defaultSearchQuery.toLowerCase()));
+
+  const getMockHolidays = (stateName: string) => {
+    if (stateName === 'Bavaria') return [
+      { name: "Heilige Drei Könige", date: "6. January", checked: true },
+      { name: "Fronleichnam", date: "04/06/2026, 27/05/2027", checked: true },
+      { name: "Mariä Himmelfahrt", date: "15. August", checked: true },
+      { name: "Allerheiligen", date: "1. November", checked: true }
+    ];
+    if (stateName === 'Berlin') return [
+      { name: "Example 1", date: "DD.MM.YYYY", checked: false },
+      { name: "Example 2", date: "DD.MM.YYYY", checked: false }
+    ];
+    return [
+      { name: "Example 1", date: "DD.MM.YYYY", checked: true },
+      { name: "Example 2", date: "DD.MM.YYYY", checked: true }
+    ];
+  };
+
+  return (
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent className="w-[600px] sm:max-w-[600px] mt-0 h-screen rounded-none p-0 border-l border-gray-200 bg-[#f9fafb] shadow-2xl [&>button]:hidden flex flex-col overflow-hidden">
+          {/* Header */}
+          <SheetHeader className="px-6 py-5 border-b border-gray-200 text-left bg-white z-20 shadow-sm shrink-0">
+            <SheetTitle className="text-[20px] font-bold text-gray-900 mb-1 leading-tight">Manage holidays</SheetTitle>
+          {defaultState && (
+            <div className="flex items-center gap-1.5 text-[14px] text-gray-500 font-medium" ref={defaultDropdownRef}>
+              <span>Default work location:</span>
+              <div 
+                className="flex items-center gap-1 cursor-pointer hover:text-gray-800 transition-colors relative"
+                onClick={() => setIsDefaultDropdownOpen(!isDefaultDropdownOpen)}
+              >
+                <span className="text-gray-700">{defaultState}</span>
+                <ChevronDown size={16} className="text-gray-500" />
+                
+                {isDefaultDropdownOpen && (
+                  <div className="absolute top-[100%] mt-2 left-0 w-[240px] bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden flex flex-col max-h-[300px]" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center px-3 py-2.5 border-b border-gray-100 shrink-0">
+                      <Search size={16} className="text-gray-400 mr-2" />
+                      <input 
+                        type="text" 
+                        placeholder="Search state" 
+                        className="flex-1 outline-none text-[14px] text-gray-700 placeholder:text-gray-400"
+                        value={defaultSearchQuery}
+                        onChange={e => setDefaultSearchQuery(e.target.value)}
+                        autoFocus
+                      />
+                    </div>
+                    <div className="overflow-y-auto py-1">
+                      {filteredDefaultStates.map(state => (
+                        <div 
+                          key={state}
+                          className="px-4 py-2 text-[14px] text-gray-900 hover:bg-gray-100 cursor-pointer transition-colors"
+                          onClick={() => handleSelectDefault(state)}
+                        >
+                          {state}
+                        </div>
+                      ))}
+                      {filteredDefaultStates.length === 0 && (
+                        <div className="px-4 py-3 text-[14px] text-gray-500 text-center">No states found</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <SheetClose className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 p-1.5 rounded-md transition-colors outline-none focus:ring-0">
+            <X size={20} />
+            <span className="sr-only">Close</span>
+          </SheetClose>
+          </SheetHeader>
+
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
+          
+          {!defaultState && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 relative" ref={defaultDropdownRef}>
+              <div className="mt-0.5 text-amber-500 shrink-0">
+                <AlertTriangle size={18} strokeWidth={2} />
+              </div>
+              <div className="text-[14px] text-amber-800 flex-1">
+                <span className="font-semibold block mb-0.5">Default state not selected</span>
+                Employees without an explicit assignment will not receive state holidays. Please select a default work location.
+              </div>
+              <div className="relative shrink-0">
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="bg-white text-amber-900 border-amber-200 hover:bg-amber-50"
+                  onClick={() => setIsDefaultDropdownOpen(!isDefaultDropdownOpen)}
+                >
+                  Select state
+                </Button>
+                {isDefaultDropdownOpen && (
+                  <div className="absolute top-[100%] mt-2 right-0 w-[240px] bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden flex flex-col max-h-[300px]" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center px-3 py-2.5 border-b border-gray-100 shrink-0">
+                      <Search size={16} className="text-gray-400 mr-2" />
+                      <input 
+                        type="text" 
+                        placeholder="Search state" 
+                        className="flex-1 outline-none text-[14px] text-gray-700 placeholder:text-gray-400"
+                        value={defaultSearchQuery}
+                        onChange={e => setDefaultSearchQuery(e.target.value)}
+                        autoFocus
+                      />
+                    </div>
+                    <div className="overflow-y-auto py-1">
+                      {filteredDefaultStates.map(state => (
+                        <div 
+                          key={state}
+                          className="px-4 py-2 text-[14px] text-gray-900 hover:bg-gray-100 cursor-pointer transition-colors"
+                          onClick={() => handleSelectDefault(state)}
+                        >
+                          {state}
+                        </div>
+                      ))}
+                      {filteredDefaultStates.length === 0 && (
+                        <div className="px-4 py-3 text-[14px] text-gray-500 text-center">No states found</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* SECTION 1: National holidays */}
+          <NationalCard />
+
+          {/* SECTION 2: State holidays */}
+          <section className="space-y-4">
+            <div className="space-y-4 relative" ref={dropdownRef}>
+              {activeStates.map(stateName => {
+                const isDefault = defaultState === stateName;
+                const explicitEmployees = employeeAssignments[stateName] || [];
+                const implicitEmployees = ALL_EMPLOYEES.filter(emp => !Object.values(employeeAssignments).some(list => list.includes(emp.id))).map(e => e.id);
+                const effectiveEmployees = isDefault 
+                  ? Array.from(new Set([...explicitEmployees, ...implicitEmployees])).filter(id => !(employeeAssignments['__unassigned__'] || []).includes(id))
+                  : explicitEmployees;
+
+                return (
+                  <StateCard 
+                    key={stateName}
+                    name={stateName} 
+                    isDefault={isDefault} 
+                    initiallyExpanded={activeStates.length === 1 || isDefault}
+                    holidays={getMockHolidays(stateName)}
+                    selectedEmployees={effectiveEmployees}
+                    onToggleEmployee={(empId) => toggleEmployee(stateName, empId)}
+                    employeeAssignments={employeeAssignments}
+                    setEmployeeAssignments={setEmployeeAssignments}
+                    activeStates={activeStates}
+                    setActiveStates={setActiveStates}
+                    defaultState={defaultState}
+                    uiVariant={uiVariant}
+                  />
+                );
+              })}
+
+              {activeStates.length > 0 && (
+                <>
+                  <div className="pt-2">
+                    <button 
+                      className="flex items-center gap-2 text-[14px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    >
+                      <Plus size={16} /> Add state
+                    </button>
+                  </div>
+
+                  {isDropdownOpen && (
+                    <div className="absolute top-[100%] mt-2 left-0 w-[320px] bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden flex flex-col max-h-[300px]">
+                      <div className="flex items-center px-3 py-2.5 border-b border-gray-100 shrink-0">
+                        <Search size={16} className="text-gray-400 mr-2" />
+                        <input 
+                          type="text" 
+                          placeholder="State name" 
+                          className="flex-1 outline-none text-[15px] text-gray-700 placeholder:text-gray-400"
+                          value={searchQuery}
+                          onChange={e => setSearchQuery(e.target.value)}
+                          autoFocus
+                        />
+                      </div>
+                      <div className="overflow-y-auto py-1">
+                        {filteredStates.map(state => (
+                          <div 
+                            key={state}
+                            className="px-4 py-2 text-[15px] text-gray-900 hover:bg-gray-100 cursor-pointer transition-colors"
+                            onClick={() => handleSelectState(state)}
+                          >
+                            {state}
+                          </div>
+                        ))}
+                        {filteredStates.length === 0 && (
+                          <div className="px-4 py-3 text-[14px] text-gray-500 text-center">No states found</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-gray-200 bg-white p-6 flex flex-col gap-4 mt-auto shrink-0 z-10 relative">
+          {defaultState !== originalDefaultState && defaultState !== null && (
+            <div className="bg-blue-50 text-blue-800 text-[13px] px-4 py-3 rounded-lg border border-blue-100 flex items-start gap-2.5 animate-in fade-in duration-300">
+               <Info size={16} className="text-blue-500 mt-[2px] shrink-0" />
+               <p className="leading-relaxed">
+                 <span className="font-semibold">
+                   {ALL_EMPLOYEES.filter(emp => !Object.values(employeeAssignments).some(list => list.includes(emp.id))).length} employees
+                 </span> will switch to {defaultState} holidays. <span className="font-semibold">
+                   {ALL_EMPLOYEES.length - ALL_EMPLOYEES.filter(emp => !Object.values(employeeAssignments).some(list => list.includes(emp.id))).length} {ALL_EMPLOYEES.length - ALL_EMPLOYEES.filter(emp => !Object.values(employeeAssignments).some(list => list.includes(emp.id))).length === 1 ? 'employee' : 'employees'}
+                 </span> with specific locations won't be affected.
+               </p>
+            </div>
+          )}
+          <div className="flex gap-4">
+            <Button variant="outline" className="flex-1 text-[14px] font-semibold border-gray-300 text-gray-700 hover:bg-gray-50 h-[42px]" onClick={handleMainCancel}>Cancel</Button>
+            <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[14px] h-[42px] shadow-sm" onClick={onClose}>Confirm and save</Button>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function NationalCard() {
+  const [expanded, setExpanded] = useState(false);
+  const [internalHolidays, setInternalHolidays] = useState<{name: string, date?: string}[]>([]);
+
+  const handleAddInternalHoliday = () => {
+    setInternalHolidays([
+      ...internalHolidays,
+      { name: "Company Anniversary", date: "DD.MM.YYYY" }
+    ]);
+  };
+  
+  const allHolidays = [
+    { name: "Example 1", date: "DD.MM.YYYY", checked: true },
+    { name: "Example 2", date: "DD.MM.YYYY", checked: true },
+    { name: "Example 3", date: "DD.MM.YYYY", checked: true }
+  ];
+  
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm transition-all">
+      <div 
+        className="flex items-center justify-between cursor-pointer select-none"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+            <Globe size={20} strokeWidth={2} />
+          </div>
+          <span className="font-bold text-[16px] text-gray-900">9 national holidays</span>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <span className="text-[14px] text-gray-500 hidden sm:inline-block">Applies to all employees</span>
+          <button className="text-gray-400 hover:text-gray-600 rounded-md transition-colors outline-none focus:ring-0">
+            {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </button>
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="mt-5 space-y-4 animate-in fade-in duration-200">
+          <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            {allHolidays.map((h, i) => (
+              <HolidayRow key={`nat-${i}`} name={h.name} date={h.date} checked={h.checked} />
+            ))}
+          </div>
+
+          {internalHolidays.length > 0 && (
+            <div className="pt-2">
+              <h4 className="text-[15px] font-semibold text-[#475569] mb-3">Company internal</h4>
+              <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                {internalHolidays.map((holiday, idx) => (
+                  <HolidayRow 
+                    key={`internal-${idx}`} 
+                    name={holiday.name} 
+                    date={holiday.date} 
+                    deletable 
+                    checked={true}
+                    onDelete={() => {
+                      setInternalHolidays(internalHolidays.filter((_, i) => i !== idx));
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <button 
+            className="flex items-center gap-2 text-[14px] font-medium text-blue-600 hover:text-blue-700 transition-colors ml-1"
+            onClick={(e) => { e.stopPropagation(); handleAddInternalHoliday(); }}
+          >
+            <PlusCircle size={16} /> Add company-internal holidays
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function HolidayRow({ name, date, checked, deletable, hideCheckbox, onDelete }: { name: string, date?: string, checked?: boolean, deletable?: boolean, hideCheckbox?: boolean, onDelete?: () => void }) {
+  return (
+    <div className="group flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+      <div className="flex items-center gap-3">
+        {!hideCheckbox && <Checkbox id={name} checked={checked} className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded-[4px]" />}
+        <label htmlFor={name} className={`text-[14px] font-medium text-gray-900 ${hideCheckbox ? '' : 'cursor-pointer'}`}>{name}</label>
+      </div>
+      <div className="flex items-center gap-3">
+        {date && <span className="text-[13px] text-gray-400 uppercase tracking-wide">{date}</span>}
+        {deletable && (
+          <button 
+            className="text-gray-400 hover:text-red-500 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete?.();
+            }}
+          >
+            <Trash2 size={15} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StateCard({ 
+  name, 
+  isDefault, 
+  initiallyExpanded,
+  holidays,
+  selectedEmployees,
+  onToggleEmployee,
+  employeeAssignments,
+  setEmployeeAssignments,
+  activeStates,
+  setActiveStates,
+  defaultState,
+  uiVariant,
+}: { 
+  name: string, 
+  isDefault: boolean, 
+  initiallyExpanded: boolean,
+  holidays: { name: string, date?: string, checked?: boolean }[],
+  selectedEmployees: string[],
+  onToggleEmployee: (empId: string) => void,
+  employeeAssignments: Record<string, string[]>,
+  setEmployeeAssignments: (assignments: Record<string, string[]>) => void,
+  activeStates: string[],
+  setActiveStates: (states: string[]) => void,
+  defaultState: string | null,
+  uiVariant: 'drawer' | 'popover'
+}) {
+  const [expanded, setExpanded] = useState(initiallyExpanded);
+  const [isEmployeeDrawerOpen, setIsEmployeeDrawerOpen] = useState(false);
+  const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
+  
+  const [drawerSnapshot, setDrawerSnapshot] = useState<{
+    employeeAssignments: Record<string, string[]>;
+    activeStates: string[];
+    defaultState: string | null;
+  } | null>(null);
+
+  const handleOpenDrawer = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDrawerSnapshot({ employeeAssignments, activeStates, defaultState });
+    setIsEmployeeDrawerOpen(true);
+  };
+
+  const handleCancelDrawer = () => {
+    if (drawerSnapshot) {
+      setEmployeeAssignments(drawerSnapshot.employeeAssignments);
+      setActiveStates(drawerSnapshot.activeStates);
+    }
+    setIsEmployeeDrawerOpen(false);
+  };
+  
+  const [initialSortOrder, setInitialSortOrder] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (isEmployeeDrawerOpen) {
+      const getCat = (emp: typeof ALL_EMPLOYEES[0]) => {
+        const explicitState = Object.keys(employeeAssignments).find(s => s !== '__unassigned__' && employeeAssignments[s]?.includes(emp.id));
+        const isUnassigned = employeeAssignments['__unassigned__']?.includes(emp.id);
+        const currentState = explicitState || (isUnassigned ? null : defaultState);
+        
+        if (!currentState) return 0; // пустые
+        if (selectedEmployees.includes(emp.id)) return 1; // подходящие под state
+        return 2; // остальные
+      };
+
+      const order = [...ALL_EMPLOYEES].sort((a, b) => {
+        const catA = getCat(a);
+        const catB = getCat(b);
+        if (catA !== catB) return catA - catB;
+        return a.name.localeCompare(b.name);
+      }).map(e => e.id);
+
+      setInitialSortOrder(order);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEmployeeDrawerOpen]);
+
+  const filteredEmployees = ALL_EMPLOYEES.filter(emp => emp.name.toLowerCase().includes(employeeSearchQuery.toLowerCase()));
+  
+  const sortedEmployees = [...filteredEmployees].sort((a, b) => {
+    if (initialSortOrder.length > 0) {
+      return initialSortOrder.indexOf(a.id) - initialSortOrder.indexOf(b.id);
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  const handleToggleEmployeeForPopover = (empId: string) => {
+    // We capture the snapshot on first interaction if needed, or simply toggle.
+    // The Drawer uses a snapshot to show visual changes (e.g. "Bavaria -> Baden"), 
+    // but the Popover is simpler and just toggles immediately.
+    onToggleEmployee(empId);
+  };
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm transition-all">
+      <div 
+        className="flex items-center justify-between cursor-pointer select-none"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+            {isDefault ? <MapPinHouse size={20} strokeWidth={2} /> : <MapPin size={20} strokeWidth={2} />}
+          </div>
+          <span className="font-bold text-[16px] text-gray-900">{name}</span>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          {/* Facepile / Employee Selector */}
+          <Tooltip>
+            {uiVariant === 'drawer' ? (
+              <TooltipTrigger asChild>
+                <div 
+                  className="flex items-center relative cursor-pointer"
+                  onClick={handleOpenDrawer}
+                >
+                  {selectedEmployees.length === 0 ? (
+                    <div className="flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                      <Plus size={14} /> Add employees
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      {selectedEmployees.slice(0, 3).map((empId, i) => {
+                        const emp = ALL_EMPLOYEES.find(e => e.id === empId);
+                        if (!emp) return null;
+                        return (
+                          <div 
+                            key={emp.id} 
+                            className={`w-[24px] h-[24px] rounded-full border-[2px] border-white flex items-center justify-center text-white text-[10px] font-medium ${emp.color} ${i !== 0 ? '-ml-[8px]' : ''}`}
+                            style={{ zIndex: 10 - i }}
+                          >
+                            {emp.initials}
+                          </div>
+                        );
+                      })}
+                      {selectedEmployees.length > 3 && (
+                        <div 
+                          className="w-[24px] h-[24px] rounded-full border-[2px] border-white bg-gray-100 flex items-center justify-center text-gray-600 text-[10px] font-medium -ml-[8px]"
+                          style={{ zIndex: 0 }}
+                        >
+                          +{selectedEmployees.length - 3}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </TooltipTrigger>
+            ) : (
+              <EmployeesPopover 
+                stateName={name}
+                selectedEmployees={selectedEmployees}
+                onToggleEmployee={handleToggleEmployeeForPopover}
+                employeeAssignments={employeeAssignments}
+                defaultState={defaultState}
+              >
+                <TooltipTrigger asChild>
+                  <div 
+                    className="flex items-center relative cursor-pointer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {selectedEmployees.length === 0 ? (
+                      <div className="flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                        <Plus size={14} /> Add employees
+                      </div>
+                    ) : (
+                      <div className="flex items-center">
+                        {selectedEmployees.slice(0, 3).map((empId, i) => {
+                          const emp = ALL_EMPLOYEES.find(e => e.id === empId);
+                          if (!emp) return null;
+                          return (
+                            <div 
+                              key={emp.id} 
+                              className={`w-[24px] h-[24px] rounded-full border-[2px] border-white flex items-center justify-center text-white text-[10px] font-medium ${emp.color} ${i !== 0 ? '-ml-[8px]' : ''}`}
+                              style={{ zIndex: 10 - i }}
+                            >
+                              {emp.initials}
+                            </div>
+                          );
+                        })}
+                        {selectedEmployees.length > 3 && (
+                          <div className="w-[24px] h-[24px] rounded-full border-[2px] border-white bg-gray-100 flex items-center justify-center text-gray-500 text-[10px] font-medium -ml-[8px] z-0">
+                            +{selectedEmployees.length - 3}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </TooltipTrigger>
+              </EmployeesPopover>
+            )}
+            <TooltipContent className="bg-gray-900 text-white border-gray-800 text-[13px] py-2 px-3 shadow-xl">
+              <p>Assign employees</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <button className="text-gray-400 hover:text-gray-600 rounded-md transition-colors outline-none focus:ring-0">
+            {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </button>
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="mt-5 animate-in fade-in duration-200 border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+          {holidays.map((h, i) => (
+            <HolidayRow key={i} name={h.name} date={h.date} checked={h.checked} />
+          ))}
+        </div>
+      )}
+
+      <Sheet open={isEmployeeDrawerOpen} onOpenChange={(open) => !open && handleCancelDrawer()} modal={false}>
+        <SheetContent usePortal={false} hideOverlay className="w-[600px] sm:max-w-[600px] mt-0 h-screen rounded-none p-0 border-l border-gray-200 bg-[#f9fafb] shadow-2xl z-[100] [&>button]:hidden flex flex-col overflow-hidden">
+            <SheetHeader className="px-6 py-5 border-b border-gray-200 text-left bg-white z-20 shadow-sm shrink-0">
+              <SheetTitle className="text-[18px] font-bold text-gray-900 mb-1 leading-tight">Employees</SheetTitle>
+            <div className="mt-4 flex items-center px-3 py-2 border border-gray-200 rounded-md bg-gray-50 focus-within:bg-white focus-within:border-blue-500 transition-colors">
+              <Search size={16} className="text-gray-400 mr-2" />
+              <input 
+                type="text" 
+                placeholder="Search employees..." 
+                className="flex-1 outline-none text-[14px] bg-transparent text-gray-900 placeholder:text-gray-400"
+                value={employeeSearchQuery}
+                onChange={e => setEmployeeSearchQuery(e.target.value)}
+              />
+            </div>
+            <SheetClose className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 p-1.5 rounded-md transition-colors outline-none focus:ring-0">
+              <X size={20} />
+            </SheetClose>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto p-6 min-h-0">
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+              {sortedEmployees.map((emp) => {
+                const isSelected = selectedEmployees.includes(emp.id);
+                const explicitState = Object.keys(employeeAssignments).find(s => s !== '__unassigned__' && employeeAssignments[s]?.includes(emp.id));
+                const isUnassigned = employeeAssignments['__unassigned__']?.includes(emp.id);
+                const currentState = explicitState || (isUnassigned ? null : defaultState);
+
+                return (
+                  <div 
+                    key={emp.id} 
+                    className="group flex items-center gap-3 px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-[12px] font-medium ${emp.color} shrink-0`}>
+                      {emp.initials}
+                    </div>
+                    <div className="flex flex-col flex-1 truncate">
+                      <span className="text-[14px] font-medium text-gray-700">{emp.name}</span>
+                    </div>
+                    
+                    <div className="shrink-0 flex items-center" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className={`text-[12px] font-medium px-2 py-1.5 rounded-md transition-colors outline-none flex items-center gap-1.5 ${isSelected ? (drawerSnapshot && (() => {
+                            const snapAssignments = drawerSnapshot.employeeAssignments;
+                            const snapDefault = drawerSnapshot.defaultState;
+                            const initialExplicitState = Object.keys(snapAssignments).find(s => s !== '__unassigned__' && snapAssignments[s]?.includes(emp.id));
+                            const isInitialUnassigned = snapAssignments['__unassigned__']?.includes(emp.id);
+                            const initialState = initialExplicitState || (isInitialUnassigned ? null : snapDefault);
+                            return initialState && initialState !== name;
+                          })() ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200') : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                            {isSelected ? (
+                              (() => {
+                                if (!drawerSnapshot) return name;
+                                const snapAssignments = drawerSnapshot.employeeAssignments;
+                                const snapDefault = drawerSnapshot.defaultState;
+                                const initialExplicitState = Object.keys(snapAssignments).find(s => s !== '__unassigned__' && snapAssignments[s]?.includes(emp.id));
+                                const isInitialUnassigned = snapAssignments['__unassigned__']?.includes(emp.id);
+                                const initialState = initialExplicitState || (isInitialUnassigned ? null : snapDefault);
+                                if (initialState && initialState !== name) {
+                                  return (
+                                    <>
+                                      <span className="line-through opacity-70">{initialState}</span>
+                                      <span>→</span>
+                                      <span>{name}</span>
+                                    </>
+                                  );
+                                }
+                                return name;
+                              })()
+                            ) : (
+                              currentState || "Unassigned"
+                            )}
+                            <ChevronDown size={14} className="opacity-50 ml-0.5" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[200px] max-h-[300px] overflow-y-auto">
+                          <DropdownMenuItem 
+                            onClick={() => {
+                              const newAssignments = { ...employeeAssignments };
+                              const newActiveStates = [...activeStates];
+                              for (const s of Object.keys(newAssignments)) {
+                                if (newAssignments[s]) newAssignments[s] = newAssignments[s].filter(id => id !== emp.id);
+                              }
+                              newAssignments['__unassigned__'] = [...(newAssignments['__unassigned__'] || []), emp.id];
+                              setEmployeeAssignments(newAssignments);
+                              setActiveStates(newActiveStates);
+                            }}
+                          >
+                            Unassigned
+                          </DropdownMenuItem>
+                          {activeStates.map(state => (
+                            <DropdownMenuItem 
+                              key={state}
+                              onClick={() => {
+                                const newAssignments = { ...employeeAssignments };
+                                const newActiveStates = [...activeStates];
+                                for (const s of Object.keys(newAssignments)) {
+                                  if (newAssignments[s]) newAssignments[s] = newAssignments[s].filter(id => id !== emp.id);
+                                }
+                                if (state !== defaultState) {
+                                  if (!newAssignments[state]) newAssignments[state] = [];
+                                  newAssignments[state].push(emp.id);
+                                  if (!newActiveStates.includes(state)) newActiveStates.push(state);
+                                }
+                                setEmployeeAssignments(newAssignments);
+                                setActiveStates(newActiveStates);
+                              }}
+                            >
+                              {state}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="border-t border-gray-200 bg-white p-6 flex gap-4 mt-auto shrink-0 z-10 relative">
+            <Button variant="outline" className="flex-1 text-[14px] font-semibold border-gray-300 text-gray-700 hover:bg-gray-50 h-[42px]" onClick={handleCancelDrawer}>Cancel</Button>
+            <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[14px] h-[42px] shadow-sm" onClick={() => setIsEmployeeDrawerOpen(false)}>Confirm and save</Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
