@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
@@ -882,40 +882,60 @@ function StateCard({
         <div className="flex items-center gap-4">
           {/* Facepile / Employee Selector */}
             {uiVariant === 'drawer' ? (
-                <div 
-                  className="flex items-center relative cursor-pointer px-1.5 py-1 -mr-1.5 rounded-md hover:bg-gray-100 transition-colors"
-                  onClick={handleOpenDrawer}
-                >
-                  {selectedEmployees.length === 0 ? (
-                    <div className="flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                      <Plus size={14} /> Add employees
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      {selectedEmployees.slice(0, 3).map((empId, i) => {
-                        const emp = ALL_EMPLOYEES.find(e => e.id === empId);
-                        if (!emp) return null;
-                        return (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div 
+                    className="flex items-center relative cursor-pointer px-1.5 py-1 -mr-1.5 rounded-md hover:bg-gray-100 transition-colors"
+                    onClick={handleOpenDrawer}
+                  >
+                    {selectedEmployees.length === 0 ? (
+                      <div className="flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                        <Plus size={14} /> Add employees
+                      </div>
+                    ) : (
+                      <div className="flex items-center">
+                        {selectedEmployees.slice(0, 3).map((empId, i) => {
+                          const emp = ALL_EMPLOYEES.find(e => e.id === empId);
+                          if (!emp) return null;
+                          return (
+                            <div 
+                              key={emp.id} 
+                              className={`w-[24px] h-[24px] rounded-full border-[2px] border-white flex items-center justify-center text-white text-[10px] font-medium ${emp.color} ${i !== 0 ? '-ml-[8px]' : ''}`}
+                              style={{ zIndex: 10 - i }}
+                            >
+                              {emp.initials}
+                            </div>
+                          );
+                        })}
+                        {selectedEmployees.length > 3 && (
                           <div 
-                            key={emp.id} 
-                            className={`w-[24px] h-[24px] rounded-full border-[2px] border-white flex items-center justify-center text-white text-[10px] font-medium ${emp.color} ${i !== 0 ? '-ml-[8px]' : ''}`}
-                            style={{ zIndex: 10 - i }}
+                            className="w-[24px] h-[24px] rounded-full border-[2px] border-white bg-gray-100 flex items-center justify-center text-gray-600 text-[10px] font-medium -ml-[8px]"
+                            style={{ zIndex: 0 }}
                           >
-                            {emp.initials}
+                            +{selectedEmployees.length - 3}
                           </div>
-                        );
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </TooltipTrigger>
+                {selectedEmployees.length > 0 ? (
+                  <TooltipContent className="bg-gray-900 text-white border-gray-800 text-[13px] py-2 px-3 shadow-xl max-w-[220px]">
+                    <div className="font-medium mb-1 text-gray-100">Assigned employees:</div>
+                    <div className="text-gray-300 space-y-0.5 mb-1.5 max-h-[120px] overflow-y-auto pr-1">
+                      {selectedEmployees.map(id => {
+                        const emp = ALL_EMPLOYEES.find(e => e.id === id);
+                        return <div key={id} className="truncate leading-tight py-0.5">{emp?.name}</div>;
                       })}
-                      {selectedEmployees.length > 3 && (
-                        <div 
-                          className="w-[24px] h-[24px] rounded-full border-[2px] border-white bg-gray-100 flex items-center justify-center text-gray-600 text-[10px] font-medium -ml-[8px]"
-                          style={{ zIndex: 0 }}
-                        >
-                          +{selectedEmployees.length - 3}
-                        </div>
-                      )}
                     </div>
-                  )}
-                </div>
+                    <div className="text-gray-400 text-[11px] italic border-t border-gray-700 pt-1.5 mt-1">Click to easily change everything!</div>
+                  </TooltipContent>
+                ) : (
+                  <TooltipContent className="bg-gray-900 text-white border-gray-800 text-[13px] py-2 px-3 shadow-xl">
+                    <p>Click to assign employees</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
             ) : (
               <EmployeesPopover 
                 stateName={name}
