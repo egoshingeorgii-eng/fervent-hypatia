@@ -8,8 +8,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
   CalendarDays, ChevronDown, Check, Clock3, Globe, MapPin, MapPinHouse, Trash2, Plus, 
-  AlertTriangle, Search, PlusCircle, ChevronUp, X, Info, Users, UserPlus, Download,
-  Settings2, ChevronLeft, ChevronRight, MoreHorizontal, FileText, CreditCard, FileBadge, History
+  AlertTriangle, Search, PlusCircle, ChevronUp, X, Info, Users,
+  Settings2, ChevronLeft, ChevronRight, MoreHorizontal, FileText, FileBadge
 } from "lucide-react";
 
 const GERMAN_STATES = [
@@ -499,7 +499,7 @@ function EmployeesPopover({
   selectedEmployees: string[];
   onToggleEmployee: (empId: string) => void;
   employeeAssignments: Record<string, string[]>;
-  setEmployeeAssignments: (assignments: Record<string, string[]> | ((prev: Record<string, string[]>) => Record<string, string[]>)) => void;
+  setEmployeeAssignments: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
   activeStates: string[];
   defaultState: string | null;
   children: React.ReactNode;
@@ -678,11 +678,10 @@ function ManageHolidaysSheet({
 }: { 
   isOpen: boolean, onClose: () => void, defaultState: string | null, setDefaultState: (state: string | null) => void, 
   activeStates: string[], setActiveStates: (states: string[]) => void,
-  employeeAssignments: Record<string, string[]>, setEmployeeAssignments: (assignments: Record<string, string[]>) => void,
+  employeeAssignments: Record<string, string[]>, setEmployeeAssignments: React.Dispatch<React.SetStateAction<Record<string, string[]>>>,
   uiVariant: 'drawer' | 'popover'
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const [mainSnapshot, setMainSnapshot] = useState<{
@@ -1203,7 +1202,7 @@ function StateCard({
   selectedEmployees: string[],
   onToggleEmployee: (empId: string) => void,
   employeeAssignments: Record<string, string[]>,
-  setEmployeeAssignments: (assignments: Record<string, string[]>) => void,
+  setEmployeeAssignments: React.Dispatch<React.SetStateAction<Record<string, string[]>>>,
   activeStates: string[],
   setActiveStates: (states: string[]) => void,
   defaultState: string | null,
