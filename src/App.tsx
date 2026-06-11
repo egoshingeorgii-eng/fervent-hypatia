@@ -490,6 +490,8 @@ function EmployeesPopover({
   selectedEmployees,
   onToggleEmployee,
   employeeAssignments,
+  setEmployeeAssignments,
+  activeStates,
   defaultState,
   children 
 }: { 
@@ -497,6 +499,8 @@ function EmployeesPopover({
   selectedEmployees: string[];
   onToggleEmployee: (empId: string) => void;
   employeeAssignments: Record<string, string[]>;
+  setEmployeeAssignments: (assignments: Record<string, string[]> | ((prev: Record<string, string[]>) => Record<string, string[]>)) => void;
+  activeStates: string[];
   defaultState: string | null;
   children: React.ReactNode;
 }) {
@@ -508,6 +512,26 @@ function EmployeesPopover({
     employeeAssignments: Record<string, string[]>;
     defaultState: string | null;
   } | null>(null);
+
+  const handleMoveEmployee = (empId: string, toState: string) => {
+    setEmployeeAssignments(prev => {
+      const next = { ...prev };
+      // Remove from all other states first (one-to-many relationship)
+      Object.keys(next).forEach(state => {
+        if (state !== '__unassigned__' && next[state]) {
+          next[state] = next[state].filter(id => id !== empId);
+        }
+      });
+      // Ensure we clean up from unassigned if they were there
+      if (next['__unassigned__']) {
+        next['__unassigned__'] = next['__unassigned__'].filter(id => id !== empId);
+      }
+      
+      // Add to new state
+      next[toState] = [...(next[toState] || []), empId];
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -582,7 +606,7 @@ function EmployeesPopover({
             return (
               <div
                 key={emp.id}
-                className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors"
+                className="group flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors relative"
                 onClick={() => onToggleEmployee(emp.id)}
               >
                 <Checkbox checked={isSelected} className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded-[4px] pointer-events-none" />
@@ -590,26 +614,55 @@ function EmployeesPopover({
                   <div className="text-[13px] font-medium text-gray-800 truncate">{emp.name}</div>
                   <div className="text-[11px] text-gray-400 truncate">{emp.jobTitle}</div>
                 </div>
-                {isSelected ? (
-                  (() => {
-                    if (!popoverSnapshot) return null;
-                    const snapAssignments = popoverSnapshot.employeeAssignments;
-                    const snapDefault = popoverSnapshot.defaultState;
-                    const initialExplicitState = Object.keys(snapAssignments).find(s => s !== '__unassigned__' && snapAssignments[s]?.includes(emp.id));
-                    const isInitialUnassigned = snapAssignments['__unassigned__']?.includes(emp.id);
-                    const initialState = initialExplicitState || (isInitialUnassigned ? null : snapDefault);
-                    if (initialState && initialState !== stateName) {
-                      return (
-                        <div className="flex items-center px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded shrink-0 text-[11px] font-medium">
-                          {stateName}
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()
-                ) : isAssignedElsewhere ? (
-                  <span className="text-[11px] text-gray-500 font-medium px-1.5 py-0.5 bg-gray-100 rounded shrink-0">{currentState}</span>
-                ) : null}
+                <div className="flex items-center gap-2">
+                  {isSelected ? (
+                    (() => {
+                      if (!popoverSnapshot) return null;
+                      const snapAssignments = popoverSnapshot.employeeAssignments;
+                      const snapDefault = popoverSnapshot.defaultState;
+                      const initialExplicitState = Object.keys(snapAssignments).find(s => s !== '__unassigned__' && snapAssignments[s]?.includes(emp.id));
+                      const isInitialUnassigned = snapAssignments['__unassigned__']?.includes(emp.id);
+                      const initialState = initialExplicitState || (isInitialUnassigned ? null : snapDefault);
+                      if (initialState && initialState !== stateName) {
+                        return (
+                          <div className="flex items-center px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded shrink-0 text-[11px] font-medium">
+                            {stateName}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()
+                  ) : isAssignedElsewhere ? (
+                    <span className="text-[11px] text-gray-500 font-medium px-1.5 py-0.5 bg-gray-100 rounded shrink-0">{currentState}</span>
+                  ) : null}
+
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger asChild>
+                      <button 
+                        onClick={(e) => e.stopPropagation()} 
+                        onPointerDown={(e) => e.stopPropagation()}
+                        className="opacity-0 group-hover:opacity-100 p-1 -mr-1 rounded-md text-gray-400 hover:text-gray-900 hover:bg-gray-200 transition-all focus:opacity-100 outline-none shrink-0"
+                      >
+                        <MoreHorizontal size={16} />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-[200px] z-[150]" onClick={(e) => e.stopPropagation()}>
+                      <div className="px-2 py-1.5 text-[11px] font-medium text-gray-500 uppercase tracking-wider">Move to...</div>
+                      {activeStates.filter(s => s !== currentState && s !== stateName).map(st => (
+                        <DropdownMenuItem 
+                          key={st}
+                          className="text-[13px] cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMoveEmployee(emp.id, st);
+                          }}
+                        >
+                          {st}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
             );
           })}
@@ -1298,6 +1351,8 @@ function StateCard({
                 selectedEmployees={selectedEmployees}
                 onToggleEmployee={handleToggleEmployeeForPopover}
                 employeeAssignments={employeeAssignments}
+                setEmployeeAssignments={setEmployeeAssignments}
+                activeStates={activeStates}
                 defaultState={defaultState}
               >
                   <div 
