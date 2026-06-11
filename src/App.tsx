@@ -682,6 +682,7 @@ function ManageHolidaysSheet({
   uiVariant: 'drawer' | 'popover'
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const [mainSnapshot, setMainSnapshot] = useState<{
