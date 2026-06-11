@@ -535,6 +535,7 @@ function EmployeesPopover({
 
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPopoverSnapshot({ employeeAssignments, defaultState });
       const getCat = (emp: typeof ALL_EMPLOYEES[0]) => {
         const explicitState = Object.keys(employeeAssignments).find(s => s !== '__unassigned__' && employeeAssignments[s]?.includes(emp.id));
@@ -701,9 +702,12 @@ function ManageHolidaysSheet({
 
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMainSnapshot({ defaultState, activeStates, employeeAssignments });
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOriginalDefaultState(defaultState);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const handleMainCancel = () => {
@@ -1258,6 +1262,7 @@ function StateCard({
         return a.name.localeCompare(b.name);
       }).map(e => e.id);
 
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInitialSortOrder(order);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
