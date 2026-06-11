@@ -217,7 +217,7 @@ export default function App() {
 // ─── People Page ──────────────────────────────────────────────────────────────
 function PeoplePage({ employees, onSelectEmployee }: { employees: typeof PEOPLE_EMPLOYEES, onSelectEmployee: (emp: typeof PEOPLE_EMPLOYEES[0]) => void }) {
   const [activeTab, setActiveTab] = useState<'active' | 'awaiting' | 'archived'>('active');
-  const [searchQuery, setSearchQuery] = useState('');
+  const searchQuery = '';
 
   const filtered = employees.filter(e =>
     `${e.firstName} ${e.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
