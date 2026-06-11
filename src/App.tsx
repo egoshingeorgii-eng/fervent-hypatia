@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { 
   CalendarDays, ChevronDown, Check, Clock3, Globe, MapPin, MapPinHouse, Trash2, Plus, 
   AlertTriangle, Search, PlusCircle, ChevronUp, X, Info, Users,
-  Settings2, ChevronLeft, ChevronRight, MoreHorizontal, FileText, FileBadge
+  Settings2, ChevronLeft, ChevronRight, MoreHorizontal, FileText, FileBadge, ExternalLink
 } from "lucide-react";
 
 const GERMAN_STATES = [
@@ -78,7 +78,7 @@ export default function App() {
   const [defaultState, setDefaultState] = useState<string | null>('Bavaria');
   const [activeStates, setActiveStates] = useState<string[]>(['Bavaria', 'Berlin']);
   const [employeeAssignments, setEmployeeAssignments] = useState<Record<string, string[]>>({});
-  const [uiVariant, setUiVariant] = useState<'drawer' | 'popover'>('popover');
+  const [uiVariant, setUiVariant] = useState<'drawer' | 'popover' | 'popover-readonly'>('popover');
   const [activePage, setActivePage] = useState<'absences' | 'people'>('absences');
   const [selectedEmployee, setSelectedEmployee] = useState<typeof PEOPLE_EMPLOYEES[0] | null>(null);
 
@@ -129,6 +129,12 @@ export default function App() {
                   onClick={() => setUiVariant('popover')}
                 >
                   Popover UI
+                </button>
+                <button 
+                  className={`px-3 py-1 text-[12px] font-medium rounded-sm transition-colors ${uiVariant === 'popover-readonly' ? 'bg-white shadow-sm text-gray-900 border border-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
+                  onClick={() => setUiVariant('popover-readonly')}
+                >
+                  Popover Read-Only
                 </button>
               </div>
             </div>
@@ -208,6 +214,25 @@ export default function App() {
           employeeAssignments={employeeAssignments}
           setEmployeeAssignments={setEmployeeAssignments}
           uiVariant={uiVariant}
+          onNavigateToEmployee={(empId) => {
+            const allEmp = ALL_EMPLOYEES.find(e => e.id === empId);
+            if (!allEmp) return;
+            const peopleEmp = PEOPLE_EMPLOYEES.find(e => e.firstName === allEmp.name.split(' ')[0] && e.lastName === allEmp.name.split(' ')[1]) || {
+              id: `p_${allEmp.id}`,
+              lastName: allEmp.name.split(' ')[1] || '',
+              firstName: allEmp.name.split(' ')[0] || '',
+              jobTitle: allEmp.jobTitle,
+              events: null,
+              birthday: '01.01.1990',
+              contractStart: '01.01.2023',
+              contractEnd: null,
+              salary: '€5,000.00',
+              paymentComponents: ['Wage/Salary']
+            };
+            setIsModalOpen(false);
+            setActivePage('people');
+            setSelectedEmployee(peopleEmp);
+          }}
         />
       </div>
     </TooltipProvider>
@@ -493,6 +518,8 @@ function EmployeesPopover({
   setEmployeeAssignments,
   activeStates,
   defaultState,
+  isReadOnly,
+  onNavigateToEmployee,
   children 
 }: { 
   stateName: string;
@@ -502,6 +529,8 @@ function EmployeesPopover({
   setEmployeeAssignments: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
   activeStates: string[];
   defaultState: string | null;
+  isReadOnly?: boolean;
+  onNavigateToEmployee?: (empId: string) => void;
   children: React.ReactNode;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -560,12 +589,16 @@ function EmployeesPopover({
   }, [isOpen]);
 
   const filteredEmployees = ALL_EMPLOYEES.filter(emp => emp.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  const sortedEmployees = [...filteredEmployees].sort((a, b) => {
+  let sortedEmployees = [...filteredEmployees].sort((a, b) => {
     if (initialSortOrder.length > 0) {
       return initialSortOrder.indexOf(a.id) - initialSortOrder.indexOf(b.id);
     }
     return a.name.localeCompare(b.name);
   });
+
+  if (isReadOnly) {
+    sortedEmployees = sortedEmployees.filter(emp => selectedEmployees.includes(emp.id));
+  }
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -578,7 +611,7 @@ function EmployeesPopover({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-3 border-b border-gray-100 bg-gray-50 rounded-t-md">
-          <div className="text-[14px] font-semibold text-gray-900 mb-2 px-1">Assign to {stateName}</div>
+          {!isReadOnly && <div className="text-[14px] font-semibold text-gray-900 mb-2 px-1">Assign to {stateName}</div>}
           <div className="flex items-center px-3 py-2 border border-gray-200 rounded-md bg-white focus-within:border-blue-500 transition-colors shadow-sm">
             <Search size={14} className="text-gray-400 mr-2" />
             <input 
@@ -596,7 +629,7 @@ function EmployeesPopover({
           className="py-1"
         >
           {sortedEmployees.length === 0 && (
-            <div className="px-4 py-8 text-center text-gray-500 text-[13px]">No employees found</div>
+            <div className="px-4 py-8 text-center text-gray-500 text-[13px]">{isReadOnly ? "No employees assigned" : "No employees found"}</div>
           )}
           {sortedEmployees.map((emp) => {
             const isSelected = selectedEmployees.includes(emp.id);
@@ -607,16 +640,27 @@ function EmployeesPopover({
             return (
               <div
                 key={emp.id}
-                className="group flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors relative"
-                onClick={() => onToggleEmployee(emp.id)}
+                className={`group flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors relative ${isReadOnly ? 'pr-8' : ''}`}
+                onClick={() => {
+                  if (isReadOnly && onNavigateToEmployee) {
+                    onNavigateToEmployee(emp.id);
+                  } else if (!isReadOnly) {
+                    onToggleEmployee(emp.id);
+                  }
+                }}
               >
-                <Checkbox checked={isSelected} className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded-[4px] pointer-events-none" />
+                {!isReadOnly && <Checkbox checked={isSelected} className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded-[4px] pointer-events-none" />}
                 <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-medium text-gray-800 truncate">{emp.name}</div>
+                  <div className="text-[13px] font-medium text-gray-800 truncate group-hover:text-blue-600 transition-colors">{emp.name}</div>
                   <div className="text-[11px] text-gray-400 truncate">{emp.jobTitle}</div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {isSelected ? (
+                {isReadOnly ? (
+                  <div className="absolute right-3 opacity-0 group-hover:opacity-100 transition-opacity flex items-center text-blue-600">
+                    <ExternalLink size={16} strokeWidth={2.5} />
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                  {!isReadOnly && isSelected ? (
                     (() => {
                       if (!popoverSnapshot) return null;
                       const snapAssignments = popoverSnapshot.employeeAssignments;
@@ -633,11 +677,11 @@ function EmployeesPopover({
                       }
                       return null;
                     })()
-                  ) : isAssignedElsewhere ? (
+                  ) : !isReadOnly && isAssignedElsewhere ? (
                     <span className="text-[11px] text-gray-500 font-medium px-1.5 py-0.5 bg-gray-100 rounded shrink-0">{currentState}</span>
                   ) : null}
 
-                  {(() => {
+                  {!isReadOnly && (() => {
                     const availableStatesToMove = activeStates.filter(s => s !== currentState && s !== stateName);
                     if (availableStatesToMove.length === 0) return null;
                     return (
@@ -670,10 +714,17 @@ function EmployeesPopover({
                     );
                   })()}
                 </div>
+                )}
               </div>
             );
           })}
         </div>
+        {isReadOnly && (
+          <div className="px-3 py-2.5 border-t border-gray-100 bg-gray-50 rounded-b-md text-[12px] text-gray-500 flex items-start gap-2 leading-snug">
+            <Info size={14} className="shrink-0 mt-[2px] text-blue-500" />
+            <span>Click an employee to view their profile and manage contract details.</span>
+          </div>
+        )}
       </PopoverContent>
     </Popover>
   );
@@ -681,12 +732,13 @@ function EmployeesPopover({
 
 function ManageHolidaysSheet({ 
   isOpen, onClose, defaultState, setDefaultState, activeStates, setActiveStates, 
-  employeeAssignments, setEmployeeAssignments, uiVariant 
+  employeeAssignments, setEmployeeAssignments, uiVariant, onNavigateToEmployee
 }: { 
   isOpen: boolean, onClose: () => void, defaultState: string | null, setDefaultState: (state: string | null) => void, 
   activeStates: string[], setActiveStates: (states: string[]) => void,
   employeeAssignments: Record<string, string[]>, setEmployeeAssignments: React.Dispatch<React.SetStateAction<Record<string, string[]>>>,
-  uiVariant: 'drawer' | 'popover'
+  uiVariant: 'drawer' | 'popover' | 'popover-readonly',
+  onNavigateToEmployee?: (empId: string) => void
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -1013,11 +1065,12 @@ function ManageHolidaysSheet({
                     setActiveStates={setActiveStates}
                     defaultState={defaultState}
                     uiVariant={uiVariant}
+                    onNavigateToEmployee={onNavigateToEmployee}
                   />
                 );
               })}
 
-              {activeStates.length > 0 && (
+              {activeStates.length > 0 && uiVariant !== 'popover-readonly' && (
                 <>
                   <div className="pt-2">
                     <button 
@@ -1074,6 +1127,9 @@ function ManageHolidaysSheet({
                  </span> will switch to {defaultState} holidays. <span className="font-semibold">
                    {ALL_EMPLOYEES.length - ALL_EMPLOYEES.filter(emp => !Object.values(employeeAssignments).some(list => list.includes(emp.id))).length} {ALL_EMPLOYEES.length - ALL_EMPLOYEES.filter(emp => !Object.values(employeeAssignments).some(list => list.includes(emp.id))).length === 1 ? 'employee' : 'employees'}
                  </span> with specific locations won't be affected.
+                 <span className="block mt-2 font-medium text-blue-900">
+                   Note: This action will also impact their payroll and contractual holidays.
+                 </span>
                </p>
             </div>
           )}
@@ -1203,6 +1259,7 @@ function StateCard({
   setActiveStates,
   defaultState,
   uiVariant,
+  onNavigateToEmployee,
 }: { 
   name: string, 
   isDefault: boolean, 
@@ -1215,7 +1272,8 @@ function StateCard({
   activeStates: string[],
   setActiveStates: (states: string[]) => void,
   defaultState: string | null,
-  uiVariant: 'drawer' | 'popover'
+  uiVariant: 'drawer' | 'popover' | 'popover-readonly',
+  onNavigateToEmployee?: (empId: string) => void
 }) {
   const [expanded, setExpanded] = useState(initiallyExpanded);
   const [isEmployeeDrawerOpen, setIsEmployeeDrawerOpen] = useState(false);
@@ -1363,6 +1421,8 @@ function StateCard({
                 setEmployeeAssignments={setEmployeeAssignments}
                 activeStates={activeStates}
                 defaultState={defaultState}
+                isReadOnly={uiVariant === 'popover-readonly'}
+                onNavigateToEmployee={onNavigateToEmployee}
               >
                   <div 
                     className="flex items-center relative cursor-pointer px-1.5 py-1 -mr-1.5 rounded-md hover:bg-gray-100 transition-colors"
@@ -1370,7 +1430,11 @@ function StateCard({
                   >
                     {selectedEmployees.length === 0 ? (
                       <div className="flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                        <Plus size={14} /> Add employees
+                        {uiVariant === 'popover-readonly' ? (
+                          <span className="text-gray-500 font-normal">No employees</span>
+                        ) : (
+                          <><Plus size={14} /> Add employees</>
+                        )}
                       </div>
                     ) : (
                       <div className="flex items-center">
