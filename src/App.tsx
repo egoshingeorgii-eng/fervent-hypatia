@@ -533,39 +533,6 @@ function EmployeesPopover({
     });
   };
 
-  const handleToggleClick = (empId: string) => {
-    const isSelected = selectedEmployees.includes(empId);
-    if (isSelected && popoverSnapshot) {
-      // UNCHECK action: Check if they came from a different state originally
-      const snapAssignments = popoverSnapshot.employeeAssignments;
-      const snapDefault = popoverSnapshot.defaultState;
-      
-      const initialExplicitState = Object.keys(snapAssignments).find(s => s !== '__unassigned__' && snapAssignments[s]?.includes(empId));
-      const isInitialUnassigned = snapAssignments['__unassigned__']?.includes(empId);
-      const initialState = initialExplicitState || (isInitialUnassigned ? null : snapDefault);
-
-      if (initialState && initialState !== stateName) {
-        // They were in a different state! Restore them instead of a dumb toggle.
-        setEmployeeAssignments(prev => {
-          const next = { ...prev };
-          if (next[stateName]) {
-            next[stateName] = next[stateName].filter(id => id !== empId);
-          }
-          if (initialExplicitState) {
-            next[initialExplicitState] = [...(next[initialExplicitState] || []), empId];
-          } else if (isInitialUnassigned) {
-            next['__unassigned__'] = [...(next['__unassigned__'] || []), empId];
-          }
-          return next;
-        });
-        return;
-      }
-    }
-    
-    // Default action (CHECK, or UNCHECK when they were originally here)
-    onToggleEmployee(empId);
-  };
-
   useEffect(() => {
     if (isOpen) {
       setPopoverSnapshot({ employeeAssignments, defaultState });
@@ -640,7 +607,7 @@ function EmployeesPopover({
               <div
                 key={emp.id}
                 className="group flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors relative"
-                onClick={() => handleToggleClick(emp.id)}
+                onClick={() => onToggleEmployee(emp.id)}
               >
                 <Checkbox checked={isSelected} className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded-[4px] pointer-events-none" />
                 <div className="flex-1 min-w-0">
@@ -817,12 +784,10 @@ function ManageHolidaysSheet({
     if (isVisuallyAssigned) {
       if (isCurrentlyAssigned) {
         newAssignments[stateName] = currentAssigned.filter(id => id !== empId);
-        // showAlert(`Removed ${empName} from ${stateName}`);
       }
       
-      if (isDefault) {
-        newAssignments['__unassigned__'] = [...(newAssignments['__unassigned__'] || []), empId];
-      }
+      // Always push to unassigned when explicitly removing a checkmark
+      newAssignments['__unassigned__'] = [...(newAssignments['__unassigned__'] || []), empId];
     } else {
       if (oldState) {
         newAssignments[oldState] = newAssignments[oldState].filter(id => id !== empId);
